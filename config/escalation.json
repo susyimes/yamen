@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "target": "edict",
+  "rules": [
+    {
+      "id": "multi-domain",
+      "if": "task crosses multiple specialist domains with non-trivial dependencies",
+      "action": "escalate"
+    },
+    {
+      "id": "high-risk",
+      "if": "task involves production deployment, sensitive permissions, secrets, or external release",
+      "action": "escalate"
+    },
+    {
+      "id": "long-running",
+      "if": "task needs long-running orchestration, parallel subtasks, or stronger audit trail",
+      "action": "escalate"
+    }
+  ]
+}

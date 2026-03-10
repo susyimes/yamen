@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "openclaw": {
+    "phase1": {
+      "mainSession": {
+        "actsAs": ["menfang", "xianling"],
+        "responsibilities": [
+          "read_rules",
+          "triage_request",
+          "select_mode",
+          "spawn_support_roles",
+          "merge_results",
+          "reply_user"
+        ]
+      },
+      "spawnOnDemand": {
+        "zhubu": {
+          "when": ["filed", "reviewed"],
+          "purpose": "draft_case_note_and_deliverables"
+        },
+        "kuaishou": {
+          "when": ["direct", "filed", "reviewed"],
+          "purpose": "execute_task"
+        },
+        "dianshi": {
+          "when": ["reviewed"],
+          "purpose": "risk_review"
+        }
+      }
+    }
+  }
+}

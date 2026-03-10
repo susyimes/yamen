@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "defaultEntryRole": "xianling",
+  "entryBehavior": {
+    "mainSessionActsAs": ["menfang", "xianling"],
+    "readFirst": [
+      "AGENTS.md",
+      "contracts/routing-modes.md",
+      "contracts/handoff.md",
+      "config/agents.json",
+      "config/runtime-map.json",
+      "config/escalation.json"
+    ]
+  },
+  "modes": {
+    "direct": {
+      "description": "低风险、单步、低沟通成本任务",
+      "roles": ["xianling", "kuaishou"],
+      "spawnRoles": ["kuaishou"],
+      "reviewRequired": false
+    },
+    "filed": {
+      "description": "中等任务，需要主簿成案后再执行",
+      "roles": ["xianling", "zhubu", "kuaishou"],
+      "spawnRoles": ["zhubu", "kuaishou"],
+      "reviewRequired": false
+    },
+    "reviewed": {
+      "description": "高风险任务，需要典史复核",
+      "roles": ["xianling", "zhubu", "kuaishou", "dianshi"],
+      "spawnRoles": ["zhubu", "kuaishou", "dianshi"],
+      "reviewRequired": true
+    }
+  }
+}
