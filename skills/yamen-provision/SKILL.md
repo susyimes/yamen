@@ -31,6 +31,8 @@ Before provisioning, read:
 - `references/auth-inheritance.md`
 - `references/failure-handling.md`
 - `references/provisioning-summary-contract.md`
+- `references/minimal-test.md`
+- `references/host-actions.md`
 
 Then:
 1. validate prerequisites
@@ -60,6 +62,7 @@ Read role-specific SOUL when generating a workspace:
 - Keep labels stable
 - Copy auth locally only
 - Report degraded or partial states honestly
+- Validate the result against `references/minimal-test.md`
 
 ## Do not
 
@@ -72,6 +75,9 @@ Read role-specific SOUL when generating a workspace:
 
 Return a compact provisioning summary using the contract in:
 - `references/provisioning-summary-contract.md`
+
+See example shape:
+- `references/summary-example.json`
 
 ## Implementation note
 

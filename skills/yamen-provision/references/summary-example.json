@@ -1,0 +1,26 @@
+{
+  "status": "ok",
+  "runtime_root": ".openclaw/yamen-runtime",
+  "workspaces": [
+    {
+      "role": "entry",
+      "workspace": "workspace-entry",
+      "label": "yamen-entry",
+      "auth_status": "copied",
+      "notes": "ready"
+    },
+    {
+      "role": "zhubu",
+      "workspace": "workspace-zhubu",
+      "label": "yamen-zhubu",
+      "auth_status": "copied",
+      "notes": "ready"
+    }
+  ],
+  "warnings": [],
+  "blockers": [],
+  "next_actions": [
+    "verify yamen-entry boot",
+    "handoff first prefect task into yamen-operator"
+  ]
+}
