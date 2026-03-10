@@ -1,0 +1,12 @@
+{
+  "title": "发布高风险生产修复方案",
+  "summary": "整理生产环境修复方案并在执行前完成复核",
+  "raw_request": "线上故障修复要今天发出去，但风险比较高，帮我整理方案并确保有人复核。",
+  "source": {
+    "channel": "webchat"
+  },
+  "priority": "high",
+  "risk_level": "high",
+  "mode": "reviewed",
+  "needs_review": true
+}

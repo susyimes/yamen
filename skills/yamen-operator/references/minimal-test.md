@@ -56,6 +56,16 @@ Also test at least these failures:
 - impossible `next_role`
 - entry closure/report generation failure
 
+## Smoke runner
+
+Use:
+
+```bash
+node scripts/run-operator-smoke.js
+```
+
+This script should verify the 3 happy paths in a stubbed local manner before wiring real OpenClaw session delivery.
+
 ## Pass condition
 
 Claim minimum viability only if:

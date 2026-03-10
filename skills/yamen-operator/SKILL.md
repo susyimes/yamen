@@ -44,6 +44,7 @@ Read operator references before driving a real flow:
 - `references/summary-report-contract.md`
 - `references/minimal-test.md`
 - `references/host-actions.md`
+- `references/session-payloads.md`
 
 ## Main workflow
 
