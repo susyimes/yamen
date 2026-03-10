@@ -21,10 +21,7 @@
       "kind": "openclaw-session",
       "requestDir": "runtime/bridge/openclaw-session/requests",
       "responseDir": "runtime/bridge/openclaw-session/responses",
-      "runtime": "subagent",
-      "agentId": "main",
-      "sessionMode": "spawn",
-      "sessionLabelPrefix": "yamen-role",
+      "useRoleSessionsConfig": true,
       "timeoutMs": 60000,
       "pollIntervalMs": 1000
     }

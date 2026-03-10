@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { buildManualHandoffText } = require("./handoff");
 const { buildBridgeBaseName } = require("./path-utils");
+const { getRoleSessionConfig } = require("./role-session-config");
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
@@ -11,17 +12,20 @@ function sleepMs(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function buildSessionEnvelope(payload, providerConfig, transition) {
+function buildSessionEnvelope(payload, providerConfig, transition, roleSessionConfig = {}) {
+  const mode = roleSessionConfig.sessionMode || providerConfig.sessionMode || "spawn";
+  const label = roleSessionConfig.sessionLabel || (roleSessionConfig.labelPrefix ? `${roleSessionConfig.labelPrefix}-${payload.acting_role}` : (providerConfig.sessionLabelPrefix ? `${providerConfig.sessionLabelPrefix}-${payload.acting_role}` : `yamen-${payload.acting_role}`));
   return {
     protocol: "yamen.openclaw-session.v1",
     delivery: "openclaw-bridge",
     role: payload.acting_role,
     session: {
-      mode: providerConfig.sessionMode || "spawn",
-      label: providerConfig.sessionLabelPrefix ? `${providerConfig.sessionLabelPrefix}-${payload.acting_role}` : `yamen-${payload.acting_role}`,
-      runtime: providerConfig.runtime || "subagent",
-      agentId: providerConfig.agentId || null,
-      timeoutMs: providerConfig.timeoutMs || 60000,
+      mode,
+      label,
+      runtime: roleSessionConfig.runtime || providerConfig.runtime || "subagent",
+      agentId: roleSessionConfig.agentId || providerConfig.agentId || null,
+      timeoutMs: roleSessionConfig.timeoutMs || providerConfig.timeoutMs || 60000,
+      spawnMode: roleSessionConfig.spawnMode || "reuse-or-spawn"
     },
     transition: {
       from: payload.current_status,
@@ -63,18 +67,20 @@ async function runOpenClawSessionProvider(providerConfig, payload, currentCase, 
   ensureDir(requestDir);
   ensureDir(responseDir);
 
+  const roleSessionConfig = providerConfig.useRoleSessionsConfig ? getRoleSessionConfig(repoRoot, payload.acting_role) : {};
   const basename = buildBridgeBaseName(currentCase.case_id, transition.action, payload.acting_role);
   const requestFile = path.join(requestDir, `${basename}.request.json`);
   const responseFile = path.join(responseDir, `${basename}.response.json`);
 
   const envelope = {
-    ...buildSessionEnvelope(payload, providerConfig, transition),
+    ...buildSessionEnvelope(payload, providerConfig, transition, roleSessionConfig),
     bridge: {
       basename,
       request_file: path.basename(requestFile),
       response_file: path.basename(responseFile),
       case_id: currentCase.case_id,
     },
+    role_session: roleSessionConfig,
   };
   fs.writeFileSync(requestFile, JSON.stringify(envelope, null, 2) + "\n", "utf8");
 

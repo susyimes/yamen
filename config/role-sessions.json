@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "defaults": {
+    "runtime": "subagent",
+    "agentId": "main",
+    "sessionMode": "spawn",
+    "spawnMode": "reuse-or-spawn",
+    "timeoutMs": 60000,
+    "labelPrefix": "yamen-role"
+  },
+  "roles": {
+    "menfang": {
+      "managedBy": "main-session",
+      "enabled": true,
+      "actsInMainSession": true
+    },
+    "xianling": {
+      "managedBy": "main-session",
+      "enabled": true,
+      "actsInMainSession": true
+    },
+    "zhubu": {
+      "managedBy": "openclaw-session",
+      "enabled": true,
+      "sessionLabel": "yamen-zhubu",
+      "runtime": "subagent",
+      "agentId": "main",
+      "sessionMode": "spawn",
+      "spawnMode": "reuse-or-spawn",
+      "purpose": "draft_case_note_and_deliverables"
+    },
+    "kuaishou": {
+      "managedBy": "openclaw-session",
+      "enabled": true,
+      "sessionLabel": "yamen-kuaishou",
+      "runtime": "subagent",
+      "agentId": "main",
+      "sessionMode": "spawn",
+      "spawnMode": "reuse-or-spawn",
+      "purpose": "execute_task_and_submit_result"
+    },
+    "dianshi": {
+      "managedBy": "openclaw-session",
+      "enabled": true,
+      "sessionLabel": "yamen-dianshi",
+      "runtime": "subagent",
+      "agentId": "main",
+      "sessionMode": "spawn",
+      "spawnMode": "reuse-or-spawn",
+      "purpose": "risk_review"
+    },
+    "zhangfang": {
+      "managedBy": "deferred",
+      "enabled": false
+    }
+  }
+}
