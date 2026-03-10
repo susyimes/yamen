@@ -1,0 +1,46 @@
+{
+  "agents": [
+    {
+      "id": "menfang",
+      "name": "门房",
+      "role": "受理分流",
+      "required": true,
+      "actions": ["classify_request", "clean_input", "summarize_request", "suggest_mode"]
+    },
+    {
+      "id": "xianling",
+      "name": "县令",
+      "role": "主官决断",
+      "required": true,
+      "actions": ["approve_case", "route_case", "assign_owner", "escalate_case", "close_case"]
+    },
+    {
+      "id": "zhubu",
+      "name": "主簿",
+      "role": "任务单与文书",
+      "required": true,
+      "actions": ["draft_case_note", "draft_plan", "define_deliverables", "draft_reply"]
+    },
+    {
+      "id": "kuaishou",
+      "name": "快手",
+      "role": "承办执行",
+      "required": true,
+      "actions": ["execute_task", "produce_artifact", "update_progress", "report_blocker"]
+    },
+    {
+      "id": "dianshi",
+      "name": "典史",
+      "role": "风控复核",
+      "required": false,
+      "actions": ["review_risk", "approve_external_action", "reject_result", "attach_review_note"]
+    },
+    {
+      "id": "zhangfang",
+      "name": "账房",
+      "role": "台账与数据",
+      "required": false,
+      "actions": ["query_data", "maintain_ledger", "summarize_metrics"]
+    }
+  ]
+}
