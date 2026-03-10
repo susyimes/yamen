@@ -21,6 +21,7 @@ relay 层现在会结合 `config/role-sessions.json` 给出角色 session 路由
 - `agentId`
 - `sessionMode`
 - `spawnMode`
+- `workspace`（显式指向 provisioned workspace）
 - `suggested_openclaw_action`
 - `suggested_steps`
 - `operator_payload`（可直接拿去构造 OpenClaw 工具调用）

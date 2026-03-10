@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { loadCase } = require("./case-store");
 const { getRoleSessionConfig } = require("./role-session-config");
+const { getProvisionedWorkspace } = require("./provisioning-config");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const BRIDGE_ROOT = path.join(REPO_ROOT, "runtime", "bridge", "openclaw-session");
@@ -42,6 +43,8 @@ function requestPathFor(requestName) {
 }
 
 function buildOperatorPayload(request, routing) {
+  const workspace = getProvisionedWorkspace(REPO_ROOT, request.role === "menfang" || request.role === "xianling" ? "entry" : request.role);
+
   if (routing.suggested_openclaw_action === "sessions_send") {
     return {
       tool: "sessions_send",
@@ -50,6 +53,7 @@ function buildOperatorPayload(request, routing) {
         message: request.prompt,
         timeoutSeconds: Math.ceil((request.session?.timeoutMs || 60000) / 1000),
       },
+      workspace,
     };
   }
 
@@ -64,10 +68,11 @@ function buildOperatorPayload(request, routing) {
       thread: usePersistentSession,
       cleanup: usePersistentSession ? "keep" : "delete",
       sandbox: "inherit",
-      cwd: REPO_ROOT,
+      cwd: workspace?.workspacePath || REPO_ROOT,
       task: request.prompt,
       timeoutSeconds: Math.ceil((request.session?.timeoutMs || 60000) / 1000),
     },
+    workspace,
   };
 }
 
@@ -79,6 +84,7 @@ function buildSessionRoutingAdvice(request) {
   const agentId = request.session?.agentId || roleSession.agentId || "main";
   const spawnMode = request.session?.spawnMode || roleSession.spawnMode || "reuse-or-spawn";
 
+  const workspace = getProvisionedWorkspace(REPO_ROOT, request.role === "menfang" || request.role === "xianling" ? "entry" : request.role);
   const base = {
     role: request.role,
     managedBy: roleSession.managedBy || "openclaw-session",
@@ -88,6 +94,7 @@ function buildSessionRoutingAdvice(request) {
     sessionMode: mode,
     spawnMode,
     purpose: roleSession.purpose || null,
+    workspace,
     suggested_openclaw_action: mode === "send" ? "sessions_send" : "sessions_spawn",
     suggested_steps: mode === "send"
       ? [
