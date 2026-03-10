@@ -61,12 +61,22 @@ Operator action:
 - request explicit closure repair from `yamen-entry`
 - if closure still fails, return operator status plus partial internal evidence to prefect and mark runtime degraded
 
+## Simplified handling rule
+
+For the current phase, prefer simple handling:
+- identify the failure class
+- stop further transitions
+- emit degraded operator status
+- emit a simple prefect-facing failure report through `yamen-entry` when possible
+- do not build complex recovery loops first
+
 ## Retry policy
 
 Keep retries small and deliberate.
 
-- schema repair: 1 retry
-- timeout retry: at most 1 retry when safe
+- schema repair: 1 retry at most
+- timeout retry: at most 1 retry when obviously safe
+- otherwise stop and report
 - semantic disagreement between roles: no blind retry; escalate to entry/prefect
 
 ## Required failure fields
@@ -79,6 +89,16 @@ When reporting a failure, include:
 - `case_id`
 - `retryable`
 - `operator_action_taken`
+
+## Failure smoke runner
+
+Use:
+
+```bash
+node scripts/run-operator-failure-smoke.js
+```
+
+This runner verifies the current simplified policy: detect failure, stop flow, emit degraded operator status, emit simple prefect-facing failure report.
 
 ## Failure exit rule
 

@@ -56,15 +56,17 @@ Also test at least these failures:
 - impossible `next_role`
 - entry closure/report generation failure
 
-## Smoke runner
+## Smoke runners
 
 Use:
 
 ```bash
 node scripts/run-operator-smoke.js
+node scripts/run-operator-failure-smoke.js
 ```
 
-This script should verify the 3 happy paths in a stubbed local manner before wiring real OpenClaw session delivery.
+- `run-operator-smoke.js` verifies the 3 happy paths in a stubbed local manner
+- `run-operator-failure-smoke.js` verifies the simple failure-stop-report behavior before wiring real OpenClaw session delivery
 
 ## Pass condition
 

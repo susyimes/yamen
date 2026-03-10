@@ -46,6 +46,10 @@ Read operator references before driving a real flow:
 - `references/host-actions.md`
 - `references/session-payloads.md`
 
+Use local verification scripts when iterating:
+- `scripts/run-operator-smoke.js`
+- `scripts/run-operator-failure-smoke.js`
+
 ## Main workflow
 
 1. Receive a prefect task.
