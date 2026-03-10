@@ -41,3 +41,9 @@
 这意味着“创建对应角色 agent”这件事，已经从口头约定升级为工程配置：
 - 不再由 prompt 临时决定角色身份
 - 而是由 OpenClaw 集成配置明确角色 session 的创建与复用方式
+
+当前 relay 已可直接读出：
+- 该交给哪个角色
+- session label 是谁
+- 建议用 `sessions_spawn` 还是 `sessions_send`
+- 该复用还是新建

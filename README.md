@@ -578,7 +578,7 @@ node runtime/orchestrator.js step <case_id> classify_request
 node runtime/orchestrator.js step <case_id> open_filed_case
 node runtime/orchestrator.js step <case_id> draft_case_note
 
-# 3) 看当前 pending request / 生成 response 骨架
+# 3) 看当前 pending request / 角色 session 路由建议 / response 骨架
 node runtime/openclaw-bridge-relay.js next
 node runtime/openclaw-bridge-relay.js show <request-file>
 node runtime/openclaw-bridge-relay.js scaffold-json <request-file>

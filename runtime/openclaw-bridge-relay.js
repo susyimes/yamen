@@ -2,6 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const { loadCase } = require("./case-store");
+const { getRoleSessionConfig } = require("./role-session-config");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const BRIDGE_ROOT = path.join(REPO_ROOT, "runtime", "bridge", "openclaw-session");
@@ -40,6 +41,36 @@ function requestPathFor(requestName) {
   return path.join(REQUEST_DIR, requestName);
 }
 
+function buildSessionRoutingAdvice(request) {
+  const roleSession = request.role_session || getRoleSessionConfig(REPO_ROOT, request.role);
+  const label = request.session?.label || roleSession.sessionLabel || null;
+  const mode = request.session?.mode || roleSession.sessionMode || "spawn";
+  const runtime = request.session?.runtime || roleSession.runtime || "subagent";
+  const agentId = request.session?.agentId || roleSession.agentId || "main";
+  const spawnMode = request.session?.spawnMode || roleSession.spawnMode || "reuse-or-spawn";
+
+  return {
+    role: request.role,
+    managedBy: roleSession.managedBy || "openclaw-session",
+    label,
+    runtime,
+    agentId,
+    sessionMode: mode,
+    spawnMode,
+    purpose: roleSession.purpose || null,
+    suggested_openclaw_action: mode === "send" ? "sessions_send" : "sessions_spawn",
+    suggested_steps: mode === "send"
+      ? [
+          `Find existing session label: ${label}`,
+          `Use sessions_send(label='${label}', message=<prompt>)`
+        ]
+      : [
+          `Use sessions_spawn(runtime='${runtime}', agentId='${agentId}', label='${label}', mode='session' or 'run', task=<prompt>)`,
+          spawnMode === "reuse-or-spawn" ? `If session '${label}' already exists, reuse it; otherwise spawn.` : `Always spawn a fresh role session.`
+        ]
+  };
+}
+
 function listPending() {
   return listRequestFiles().map((name) => {
     const request = readJson(requestPathFor(name));
@@ -53,6 +84,7 @@ function listPending() {
       session_mode: request.session?.mode,
       label: request.session?.label,
       bridge_basename: request.bridge?.basename || null,
+      routing: buildSessionRoutingAdvice(request),
     };
   });
 }
@@ -133,6 +165,7 @@ function buildNextHints() {
       case_id: first.case_id,
       role: first.role,
       action: first.action,
+      routing: first.routing,
       next_steps: [
         `node runtime/openclaw-bridge-relay.js show ${first.request_file}`,
         `node runtime/openclaw-bridge-relay.js scaffold-json ${first.request_file}`,
@@ -201,7 +234,10 @@ function main() {
 
   if (command === 'show') {
     const request = readJson(requestPathFor(args[0]));
-    printJson(request);
+    printJson({
+      ...request,
+      routing: buildSessionRoutingAdvice(request),
+    });
     return;
   }
 
@@ -305,4 +341,5 @@ module.exports = {
   validateRoleResult,
   buildNextHints,
   buildFiledStepPlan,
+  buildSessionRoutingAdvice,
 };
