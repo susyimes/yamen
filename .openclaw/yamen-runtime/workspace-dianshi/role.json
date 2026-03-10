@@ -1,0 +1,11 @@
+{
+  "purpose": "risk_review",
+  "workspace": "workspace-dianshi",
+  "agentId": "main",
+  "label": "yamen-dianshi",
+  "spawnMode": "reuse-or-spawn",
+  "managedBy": "openclaw-session",
+  "sessionMode": "spawn",
+  "id": "dianshi",
+  "runtime": "subagent"
+}

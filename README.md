@@ -621,7 +621,34 @@ Yamen 入口 = 门房 + 县令（合并为 yamen-entry）
 
 也就是说，主会话不直接扮演 Yamen，而是向独立的 `yamen-entry` 系统下发任务。
 
-### 第 3 步：主会话先读取这些文件
+### 第 3 步：先 provision 一套角色运行环境
+
+在仓库根目录运行：
+
+```powershell
+pwsh -File scripts/bootstrap-yamen-runtime.ps1
+```
+
+它会在：
+
+```text
+.openclaw/yamen-runtime/
+```
+
+下生成：
+- `workspace-entry`
+- `workspace-zhubu`
+- `workspace-kuaishou`
+- `workspace-dianshi`
+
+每个 workspace 至少会包含：
+- `AGENTS.md`
+- `SOUL.md`
+- `role.json`
+- `README.md`
+- `auth-profiles.json`（若主环境存在可复制源）
+
+### 第 4 步：主会话先读取这些文件
 至少读取：
 
 - `AGENTS.md`
@@ -634,14 +661,14 @@ Yamen 入口 = 门房 + 县令（合并为 yamen-entry）
 - `config/bootstrap.json`
 - `config/entrypoint.md`
 
-### 第 4 步：按需调用支持角色
+### 第 5 步：按需调用支持角色
 工程接入阶段先只做这件事：
 
 - 需要成案 → 调主簿
 - 需要执行 → 调快手
 - 需要复核 → 调典史
 
-### 第 5 步：用 OpenClaw 的这些能力就够了
+### 第 6 步：用 OpenClaw 的这些能力就够了
 
 - `read`：读取规则文件
 - `sessions_spawn`：按需创建角色会话

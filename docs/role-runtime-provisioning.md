@@ -37,24 +37,23 @@
 - `AGENTS.md`：该角色 workspace 的运行说明
 - `SOUL.md`：角色人格/职责文本
 - `role.json`：角色元信息（role id / label / runtime / purpose）
+- `README.md`：workspace 来源说明
 - `auth-profiles.json`：从主环境复制的一份最小 auth profiles
+- `memory/`：角色本地记忆目录
+- `logs/`：角色本地日志目录
 
 ## auth 继承策略
 
 当前最小策略：`copy-main-profile`
 
 即：
-- 源：主环境的 `auth-profiles.json`
-- 目标：复制到每个角色 workspace
+- 优先从主环境复制 `auth-profiles.json`
+- bootstrap 会尝试多个常见来源路径
+- 若确实不存在，可用 `-Force` 先生成占位文件
 
 原因：
 - 先保证角色 workspace 能实际发起会话
 - 先解决“逻辑配置存在，但运行时无模型/鉴权”的问题
-
-后续再考虑：
-- 引用式继承
-- 多 profile 分流
-- 角色独立认证
 
 ## entry session
 
@@ -69,12 +68,12 @@
 - 调用 zhubu / kuaishou / dianshi
 - 向知府/主会话回禀
 
-## provisioning 脚本目标
+## bootstrap 当前行为
 
-bootstrap 脚本最少要做到：
+`bootstrap-yamen-runtime.ps1` 现在会：
 1. 创建目录树
 2. 写入各角色最小文件
-3. 复制 auth profiles
+3. 尝试复制 auth profiles
 4. 生成 entry / zhubu / kuaishou / dianshi 的 role.json
 5. 输出创建结果
 

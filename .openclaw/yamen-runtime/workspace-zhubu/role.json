@@ -1,0 +1,11 @@
+{
+  "purpose": "draft_case_note_and_deliverables",
+  "workspace": "workspace-zhubu",
+  "agentId": "main",
+  "label": "yamen-zhubu",
+  "spawnMode": "reuse-or-spawn",
+  "managedBy": "openclaw-session",
+  "sessionMode": "spawn",
+  "id": "zhubu",
+  "runtime": "subagent"
+}

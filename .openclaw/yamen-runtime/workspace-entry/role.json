@@ -1,0 +1,11 @@
+{
+  "purpose": "merged menfang+xianling entry for prefect-submitted tasks",
+  "workspace": "workspace-entry",
+  "agentId": "main",
+  "label": "yamen-entry",
+  "spawnMode": "reuse-or-spawn",
+  "managedBy": "openclaw-session",
+  "sessionMode": "spawn",
+  "id": "entry",
+  "runtime": "subagent"
+}

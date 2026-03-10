@@ -1,0 +1,11 @@
+{
+  "purpose": "execute_task_and_submit_result",
+  "workspace": "workspace-kuaishou",
+  "agentId": "main",
+  "label": "yamen-kuaishou",
+  "spawnMode": "reuse-or-spawn",
+  "managedBy": "openclaw-session",
+  "sessionMode": "spawn",
+  "id": "kuaishou",
+  "runtime": "subagent"
+}
