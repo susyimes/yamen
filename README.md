@@ -565,86 +565,21 @@ Yamen 不适合所有任务。
 
 这一节只讲：**怎么把 Yamen 作为规则层接进 OpenClaw，并在 OpenClaw 内部运行成一种工作模式。**
 
-### 新定位
+### 当前定位
 
-- **Yamen repo**：规则层 / 制度包
-- **OpenClaw**：运行层 / 宿主系统
-- **skills/yamen-provision**：负责角色运行环境 provisioning（优先实现）
-- **skills/yamen-operator**：负责知府 -> entry -> internal roles -> entry report 的内部流转
+- **Yamen repo** = 规则层
+- **OpenClaw** = 运行层
+- **`skills/yamen-provision`** = 角色运行环境 provisioning
+- **`skills/yamen-operator`** = 内部执行 skill，负责 `prefect -> entry -> internal roles -> entry report`
 
-### Quick Start：先跑通最小 filed 闭环（当前过渡路径）
+也就是说：
+- repo 负责 contract / transitions / references
+- OpenClaw 负责 session / relay / execution / stop-and-report
+- `yamen-operator` 负责把规则真的驱动起来
 
-在仓库根目录：
+---
 
-### Prefect → Yamen Entry（阶段 2 主路径）
-
-如果你要按“知府下发任务 -> yamen-entry 独立受理”的方式走，先用：
-
-```powershell
-node runtime/prefect-flow.js submit runtime/sample-request.filed.json
-```
-
-它会：
-- 创建 case
-- 标记提交者为 prefect
-- 挂上 `yamen-entry / zhubu / kuaishou / dianshi` 的 provisioned workspace 信息
-- 给出下一步应交给 `yamen-entry` 的入口信息
-
-```powershell
-# 1) 创建 filed 案件
-node runtime/orchestrator.js create runtime/sample-request.filed.json
-
-# 2) 推进到主簿
-node runtime/orchestrator.js step <case_id> classify_request
-node runtime/orchestrator.js step <case_id> open_filed_case
-node runtime/orchestrator.js step <case_id> draft_case_note
-
-# 3) 看当前 pending request / 角色 session 路由建议 / response 骨架
-node runtime/openclaw-bridge-relay.js next
-node runtime/openclaw-bridge-relay.js show <request-file>
-node runtime/openclaw-bridge-relay.js scaffold-json <request-file>
-
-# 4) 用 OpenClaw 角色 session 产出 JSON，直接粘贴写回 response
-node runtime/openclaw-bridge-relay.js write-response-stdin <request-file>
-
-# 5) 看 filed 下一步推荐，再继续推进
-node runtime/openclaw-bridge-relay.js step-filed <case_id>
-node runtime/orchestrator.js step <case_id> draft_case_note
-node runtime/orchestrator.js step <case_id> execute_task
-node runtime/orchestrator.js step <case_id> submit_result
-```
-
-如果想先走半自动顺序，见：
-- `docs/filed-minimal-checklist.md`
-- `scripts/run-filed-minimal.ps1`
-
-> 注：这一条仍然是当前过渡路径。最终方向是把 Yamen 主要运行逻辑收敛到 OpenClaw 内部 skills，而不是继续加重 repo `runtime/*.js`。
-
-### 第 1 步：把仓库放进 OpenClaw workspace
-保留这些文件结构：
-
-```text
-yamen/
-├─ AGENTS.md
-├─ agents/
-├─ contracts/
-├─ cases/templates/
-├─ config/
-└─ docs/
-```
-
-### 第 2 步：阶段 2 的正式接入模型
-推荐运行方式：
-
-```text
-主会话 = 知府 / 外部上级
-Yamen 入口 = 门房 + 县令（合并为 yamen-entry）
-按需调用 = 主簿 / 快手 / 典史
-```
-
-也就是说，主会话不直接扮演 Yamen，而是向独立的 `yamen-entry` 系统下发任务。
-
-### 第 3 步：先 provision 一套角色运行环境
+### 第 0 步：先 provision 一套角色运行环境
 
 在仓库根目录运行：
 
@@ -652,13 +587,8 @@ Yamen 入口 = 门房 + 县令（合并为 yamen-entry）
 pwsh -File scripts/bootstrap-yamen-runtime.ps1
 ```
 
-它会在：
+它会在 `.openclaw/yamen-runtime/` 下生成：
 
-```text
-.openclaw/yamen-runtime/
-```
-
-下生成：
 - `workspace-entry`
 - `workspace-zhubu`
 - `workspace-kuaishou`
@@ -668,85 +598,167 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 - `AGENTS.md`
 - `SOUL.md`
 - `role.json`
-- `README.md`
-- `auth-profiles.json`（优先从 `.openclaw/agents/main/agent/auth-profiles.json` 复制；仅本地 provision，不提交仓库）
+- `auth-profiles.json`
 
-### 第 4 步：主会话先读取这些文件
-至少读取：
+---
 
-- `AGENTS.md`
-- `contracts/routing-modes.md`
-- `contracts/handoff.md`
-- `config/agents.json`
-- `config/routing.json`
-- `config/runtime-map.json`
-- `config/escalation.json`
-- `config/bootstrap.json`
-- `config/entrypoint.md`
+### 第 1 步：确认三条最小入口
 
-### 第 5 步：按需调用支持角色
-工程接入阶段先只做这件事：
+#### A. 先验证规则和 contract 没漂
 
-- 需要成案 → 调主簿
-- 需要执行 → 调快手
-- 需要复核 → 调典史
+```bash
+node scripts/run-operator-smoke.js
+node scripts/run-operator-failure-smoke.js
+```
 
-### 第 6 步：用 OpenClaw 的这些能力就够了
+这两条分别验证：
+- 3 条 happy path：`direct / filed / reviewed`
+- 4 类简单失败：timeout / invalid JSON / next_role 漂移 / entry closure fail
 
-- `read`：读取规则文件
+#### B. 把一个 bridge request 导出成可执行的 OpenClaw session tool 参数
+
+```bash
+node scripts/export-openclaw-session-payload.js <request-file>
+```
+
+它会输出：
+- `suggested_tool`：`sessions_spawn` 或 `sessions_send`
+- `directly_executable_args`：可直接照着执行的参数草案
+
+#### C. 走一遍 filed 半自动演练
+
+推荐先用 ASCII sample，避免 PowerShell 中文 case_id 编码问题：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 -RequestFile runtime/sample-request.filed.ascii.json
+```
+
+常用参数：
+
+```powershell
+# 自动写 scaffold response，适合干跑
+powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 -RequestFile runtime/sample-request.filed.ascii.json -AutoScaffold
+
+# 最后自动附加 entry report
+powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 -RequestFile runtime/sample-request.filed.ascii.json -AutoScaffold -AutoReport
+```
+
+---
+
+### 第 2 步：理解正式接入模型
+
+推荐运行方式：
+
+```text
+main session = prefect / external superior
+entry session = menfang + xianling (merged as yamen-entry)
+internal role sessions = zhubu / kuaishou / dianshi
+```
+
+也就是说：
+- 主会话不直接扮演 Yamen
+- 主会话向独立的 `yamen-entry` 提交案件
+- `yamen-entry` 决定 `direct / filed / reviewed`
+- 再按需调 `zhubu / kuaishou / dianshi`
+
+---
+
+### 第 3 步：最小 bridge 操作流
+
+先按下面这条标准顺序跑：
+
+```bash
+node runtime/openclaw-bridge-relay.js list
+node runtime/openclaw-bridge-relay.js show <request-file>
+node scripts/export-openclaw-session-payload.js <request-file>
+# 在 OpenClaw 中执行上一步导出的 sessions_spawn / sessions_send 参数
+node runtime/openclaw-bridge-relay.js write-response-stdin <request-file>
+```
+
+如果想压缩步骤，用：
+
+```bash
+node scripts/relay-semi-auto.js <request-file>
+```
+
+或：
+
+```bash
+node scripts/relay-semi-auto.js <request-file> --stdin
+```
+
+---
+
+### 第 4 步：阶段 2 的主路径
+
+现在 repo 里的主路径是：
+
+```text
+prefect (main session)
+-> yamen-entry
+-> zhubu / kuaishou / dianshi
+-> yamen-entry report
+-> prefect
+```
+
+可直接用：
+
+```bash
+node runtime/prefect-flow.js submit runtime/sample-request.filed.json
+node runtime/prefect-flow.js show <case_id>
+node runtime/prefect-flow.js report <case_id> <entry-report.json>
+```
+
+---
+
+### 第 5 步：OpenClaw 里真正需要的能力
+
+工程接入阶段，先只依赖这些能力：
+
+- `read`：读取规则文件与 contract
 - `sessions_spawn`：按需创建角色会话
-- `sessions_send`：把任务交给角色
-- `write/edit`：生成任务单与回禀草稿
-- `exec/browser`：让快手承办执行
+- `sessions_send`：向已有角色会话发 handoff
+- `write/edit`：生成任务单、报告、桥接 response
+- `exec/browser`：让快手承办执行具体动作
+
+---
 
 ### 最小接入完成标准
-满足下面几条，就说明 Yamen 已经接进 OpenClaw：
 
-- 主会话能按门房规则整理请求
-- 主会话能按县令规则选择 `direct / filed / reviewed`
-- 主会话能按需调用主簿 / 快手 / 典史
+满足下面几条，就说明 Yamen 已经以“规则层 + 运行层”方式接进 OpenClaw：
+
+- 主会话能以 prefect 身份提交案件
+- `yamen-entry` 能输出合法 intake / report 结构
+- `zhubu / kuaishou / dianshi` 能通过 OpenClaw session 或 bridge 被调用
 - 角色交接遵循 `contracts/handoff.md`
+- 失败时能 stop-and-report，而不是静默漂移
 
-更详细的运行说明见：
+---
 
-**规则层 / 核心配置**
-- `config/role-runners.json`
-- `config/role-sessions.json`
-- `config/provisioning.json`
-- `contracts/entry-output.schema.json`
+### 推荐先读这些文件
+
+**规则层 / 核心 contract**
 - `contracts/case.schema.json`
+- `contracts/entry-output.schema.json`
+- `contracts/operator-status.schema.json`
+- `contracts/prefect-report.schema.json`
 - `contracts/transitions.json`
+- `contracts/handoff.md`
 
-**OpenClaw 接入与运行模式**
+**运行层 / 接入路径**
 - `docs/openclaw-integration-plan.md`
-- `docs/role-runtime-provisioning.md`
 - `docs/prefect-flow.md`
-- `docs/role-session-routing.md`
-- `skills/yamen-provision/SKILL.md`
-- `skills/yamen-provision/references/provisioning-checklist.md`
-- `skills/yamen-provision/references/workspace-contract.md`
-- `skills/yamen-provision/references/execution-flow.md`
-- `skills/yamen-provision/references/auth-inheritance.md`
-- `skills/yamen-provision/references/failure-handling.md`
-- `skills/yamen-provision/references/provisioning-summary-contract.md`
-- `skills/yamen-provision/references/minimal-test.md`
-- `skills/yamen-provision/references/host-actions.md`
-- `skills/yamen-provision/references/summary-example.json`
-- `skills/yamen-operator/SKILL.md`
-
-**过渡层 / 参考实现**
-- `docs/openclaw-runtime.md`
-- `docs/runtime-architecture.md`
-- `docs/p4-orchestrator-runbook.md`
-- `docs/role-executor-interface.md`
-- `docs/openclaw-session-provider.md`
 - `docs/openclaw-bridge-runbook.md`
-- `docs/openclaw-bridge-relay-implementation.md`
-- `docs/filed-minimal-checklist.md`
-- `docs/phase1-runbook.md`
-- `docs/minimal-gap.md`
-- `config/bootstrap.json`
-- `config/entrypoint.md`
+- `docs/openclaw-session-payload-exporter.md`
+- `docs/operator-runtime-progression.md`
+
+**skills**
+- `skills/yamen-provision/SKILL.md`
+- `skills/yamen-operator/SKILL.md`
+- `skills/yamen-operator/references/execution-flow.md`
+- `skills/yamen-operator/references/failure-handling.md`
+- `skills/yamen-operator/references/session-payloads.md`
+- `skills/yamen-operator/references/bridge-driver.md`
 
 ---
 
