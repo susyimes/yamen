@@ -41,6 +41,35 @@ function requestPathFor(requestName) {
   return path.join(REQUEST_DIR, requestName);
 }
 
+function buildOperatorPayload(request, routing) {
+  if (routing.suggested_openclaw_action === "sessions_send") {
+    return {
+      tool: "sessions_send",
+      payload: {
+        label: routing.label,
+        message: request.prompt,
+        timeoutSeconds: Math.ceil((request.session?.timeoutMs || 60000) / 1000),
+      },
+    };
+  }
+
+  return {
+    tool: "sessions_spawn",
+    payload: {
+      runtime: routing.runtime,
+      agentId: routing.agentId,
+      label: routing.label,
+      mode: routing.spawnMode === "reuse-or-spawn" ? "session" : "run",
+      thread: false,
+      cleanup: routing.spawnMode === "reuse-or-spawn" ? "keep" : "delete",
+      sandbox: "inherit",
+      cwd: REPO_ROOT,
+      task: request.prompt,
+      timeoutSeconds: Math.ceil((request.session?.timeoutMs || 60000) / 1000),
+    },
+  };
+}
+
 function buildSessionRoutingAdvice(request) {
   const roleSession = request.role_session || getRoleSessionConfig(REPO_ROOT, request.role);
   const label = request.session?.label || roleSession.sessionLabel || null;
@@ -49,7 +78,7 @@ function buildSessionRoutingAdvice(request) {
   const agentId = request.session?.agentId || roleSession.agentId || "main";
   const spawnMode = request.session?.spawnMode || roleSession.spawnMode || "reuse-or-spawn";
 
-  return {
+  const base = {
     role: request.role,
     managedBy: roleSession.managedBy || "openclaw-session",
     label,
@@ -68,6 +97,11 @@ function buildSessionRoutingAdvice(request) {
           `Use sessions_spawn(runtime='${runtime}', agentId='${agentId}', label='${label}', mode='session' or 'run', task=<prompt>)`,
           spawnMode === "reuse-or-spawn" ? `If session '${label}' already exists, reuse it; otherwise spawn.` : `Always spawn a fresh role session.`
         ]
+  };
+
+  return {
+    ...base,
+    operator_payload: buildOperatorPayload(request, base),
   };
 }
 
@@ -342,4 +376,5 @@ module.exports = {
   buildNextHints,
   buildFiledStepPlan,
   buildSessionRoutingAdvice,
+  buildOperatorPayload,
 };

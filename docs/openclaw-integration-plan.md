@@ -47,3 +47,4 @@
 - session label 是谁
 - 建议用 `sessions_spawn` 还是 `sessions_send`
 - 该复用还是新建
+- 对应的 operator payload 应该长什么样
