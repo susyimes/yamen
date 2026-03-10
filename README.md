@@ -563,9 +563,16 @@ Yamen 不适合所有任务。
 
 ## OpenClaw Get Started（工程接入）
 
-这一节只讲：**怎么把 Yamen 工程接进 OpenClaw。**
+这一节只讲：**怎么把 Yamen 作为规则层接进 OpenClaw，并在 OpenClaw 内部运行成一种工作模式。**
 
-### Quick Start：先跑通最小 filed 闭环
+### 新定位
+
+- **Yamen repo**：规则层 / 制度包
+- **OpenClaw**：运行层 / 宿主系统
+- **skills/yamen-provision**：负责角色运行环境 provisioning
+- **skills/yamen-operator**：负责知府 -> entry -> internal roles -> entry report 的内部流转
+
+### Quick Start：先跑通最小 filed 闭环（当前过渡路径）
 
 在仓库根目录：
 
@@ -610,6 +617,8 @@ node runtime/orchestrator.js step <case_id> submit_result
 如果想先走半自动顺序，见：
 - `docs/filed-minimal-checklist.md`
 - `scripts/run-filed-minimal.ps1`
+
+> 注：这一条仍然是当前过渡路径。最终方向是把 Yamen 主要运行逻辑收敛到 OpenClaw 内部 skills，而不是继续加重 repo `runtime/*.js`。
 
 ### 第 1 步：把仓库放进 OpenClaw workspace
 保留这些文件结构：
@@ -700,14 +709,24 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 
 更详细的运行说明见：
 
+**规则层 / 核心配置**
 - `config/role-runners.json`
 - `config/role-sessions.json`
 - `config/provisioning.json`
-
-- `docs/openclaw-runtime.md`
-- `docs/role-runtime-provisioning.md`
 - `contracts/entry-output.schema.json`
+- `contracts/case.schema.json`
+- `contracts/transitions.json`
+
+**OpenClaw 接入与运行模式**
 - `docs/openclaw-integration-plan.md`
+- `docs/role-runtime-provisioning.md`
+- `docs/prefect-flow.md`
+- `docs/role-session-routing.md`
+- `skills/yamen-provision/SKILL.md`
+- `skills/yamen-operator/SKILL.md`
+
+**过渡层 / 参考实现**
+- `docs/openclaw-runtime.md`
 - `docs/runtime-architecture.md`
 - `docs/p4-orchestrator-runbook.md`
 - `docs/role-executor-interface.md`

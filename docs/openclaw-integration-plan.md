@@ -1,6 +1,10 @@
 # OpenClaw Integration Plan
 
-阶段 2 的目标不是继续验证 runtime demo，而是把 Yamen 正式接进 OpenClaw。
+Yamen 现在重新定位为：
+- **规则层 / 制度包**：由仓库提供
+- **OpenClaw 内部工作模式**：由 OpenClaw skills 与 session runtime 承接
+
+阶段 2 的目标，不再是继续加重 repo runtime，而是把 Yamen 正式变成 OpenClaw 内部工作模式。
 
 当前接入模型：
 
@@ -10,7 +14,8 @@
 - 角色 session：`zhubu / kuaishou / dianshi`
 - 角色 session 规范：`config/role-sessions.json`
 - provisioning 规范：`config/provisioning.json`
-- role runner provider：`config/role-runners.json`
+- OpenClaw 内部 skills：`skills/yamen-provision/`、`skills/yamen-operator/`
+- role runner provider：`config/role-runners.json`（过渡层）
 
 ## 当前原则
 
@@ -19,14 +24,17 @@
 3. 支持角色通过 OpenClaw session 承接具体动作
 4. 角色 session 不需要长期常驻，但必须有固定身份规则与独立 workspace
 5. 角色 session 的创建/复用规则由 `role-sessions.json` 统一定义
-6. 角色运行环境 provisioning 由 `config/provisioning.json` 与 bootstrap 脚本定义
-7. 非线程场景下，operator payload 默认退化为 `sessions_spawn(mode="run")`，避免 OpenClaw session 约束不满足
+6. 角色运行环境 provisioning 由 `yamen-provision` skill 主导；repo 脚本仅作参考实现
+7. 具体案件流转由 `yamen-operator` skill 主导；repo runtime 仅作过渡层/参考实现
+8. 非线程场景下，operator payload 默认退化为 `sessions_spawn(mode="run")`，避免 OpenClaw session 约束不满足
 
 ## 角色层级
 
 ### 主会话内角色
-- `menfang`
-- `xianling`
+- `prefect`
+
+### Yamen 入口 session
+- `entry = menfang + xianling`
 
 ### OpenClaw 角色 session
 - `zhubu`
@@ -48,10 +56,11 @@
 - 不再由 prompt 临时决定角色身份
 - 而是由 OpenClaw 集成配置明确角色 session 的创建与复用方式
 
-当前 relay 已可直接读出：
-- 该交给哪个角色
-- session label 是谁
-- 建议用 `sessions_spawn` 还是 `sessions_send`
-- 该复用还是新建
-- 对应的 operator payload 应该长什么样
-- 应该在哪个 provisioned workspace 启动该角色
+当前实现已经说明：
+- 仓库可以稳定提供规则与角色模板
+- OpenClaw 可以承接 entry / zhubu / kuaishou / dianshi 的内部流转
+- provisioned workspace、routing、operator payload 都已被验证
+
+下一步重点不再是加重 repo runtime，而是把主要执行逻辑收敛到：
+- `skills/yamen-provision/`
+- `skills/yamen-operator/`
