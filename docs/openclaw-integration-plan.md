@@ -6,6 +6,7 @@
 
 - 主会话：`prefect / 知府 / 外部上级`
 - Yamen 入口 session：`entry = menfang + xianling`
+- entry 输出契约：`contracts/entry-output.schema.json`
 - 角色 session：`zhubu / kuaishou / dianshi`
 - 角色 session 规范：`config/role-sessions.json`
 - provisioning 规范：`config/provisioning.json`

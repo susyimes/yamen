@@ -179,7 +179,18 @@ if (require.main === module) {
   });
 }
 
+function loadCaseForRuntime(caseId) {
+  return loadCase(REPO_ROOT, caseId);
+}
+
+function updateCaseForRuntime(caseId, currentCase) {
+  saveActiveCase(REPO_ROOT, currentCase);
+  return currentCase;
+}
+
 module.exports = {
   createCase,
   stepCase,
+  loadCaseForRuntime,
+  updateCaseForRuntime,
 };

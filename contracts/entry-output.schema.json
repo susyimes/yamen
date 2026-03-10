@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/susyimes/yamen/contracts/entry-output.schema.json",
+  "title": "Yamen Entry Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "role",
+    "action",
+    "case_title",
+    "summary",
+    "suggested_mode",
+    "accept",
+    "next_role",
+    "note",
+    "priority",
+    "risk_level",
+    "occurred_at"
+  ],
+  "properties": {
+    "role": { "const": "entry" },
+    "action": { "const": "intake_and_route" },
+    "case_title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "suggested_mode": { "type": "string", "enum": ["direct", "filed", "reviewed"] },
+    "accept": { "type": "boolean" },
+    "next_role": { "type": "string", "enum": ["entry", "zhubu", "kuaishou", "dianshi"] },
+    "note": { "type": "string", "minLength": 1 },
+    "priority": { "type": "string", "enum": ["low", "normal", "high", "urgent"] },
+    "risk_level": { "type": "string", "enum": ["low", "medium", "high"] },
+    "occurred_at": { "type": "string" }
+  }
+}

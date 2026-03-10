@@ -569,6 +569,20 @@ Yamen 不适合所有任务。
 
 在仓库根目录：
 
+### Prefect → Yamen Entry（阶段 2 主路径）
+
+如果你要按“知府下发任务 -> yamen-entry 独立受理”的方式走，先用：
+
+```powershell
+node runtime/prefect-flow.js submit runtime/sample-request.filed.json
+```
+
+它会：
+- 创建 case
+- 标记提交者为 prefect
+- 挂上 `yamen-entry / zhubu / kuaishou / dianshi` 的 provisioned workspace 信息
+- 给出下一步应交给 `yamen-entry` 的入口信息
+
 ```powershell
 # 1) 创建 filed 案件
 node runtime/orchestrator.js create runtime/sample-request.filed.json
@@ -692,6 +706,7 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 
 - `docs/openclaw-runtime.md`
 - `docs/role-runtime-provisioning.md`
+- `contracts/entry-output.schema.json`
 - `docs/openclaw-integration-plan.md`
 - `docs/runtime-architecture.md`
 - `docs/p4-orchestrator-runbook.md`
