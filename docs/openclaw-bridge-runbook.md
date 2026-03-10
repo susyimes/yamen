@@ -52,4 +52,13 @@
 - 用 OpenClaw 主会话手动/半自动转发给角色 session
 - 把返回 JSON 写回 response 文件
 
+当前仓库已提供最小 relay helper：
+
+```bash
+node runtime/openclaw-bridge-relay.js list
+node runtime/openclaw-bridge-relay.js show <request-file>
+node runtime/openclaw-bridge-relay.js scaffold <request-file>
+node runtime/openclaw-bridge-relay.js fail <request-file> "reason"
+```
+
 第二阶段再做自动 watcher。

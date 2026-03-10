@@ -632,6 +632,7 @@ yamen/
 - `docs/role-executor-interface.md`
 - `docs/openclaw-session-provider.md`
 - `docs/openclaw-bridge-runbook.md`
+- `docs/openclaw-bridge-relay-implementation.md`
 - `docs/phase1-runbook.md`
 - `docs/minimal-gap.md`
 - `config/bootstrap.json`
