@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { buildHandoffPayload, buildManualHandoffText, summarizeText } = require("./handoff");
+const { runOpenClawSessionProvider } = require("./openclaw-session-provider");
 
 function nowIso() {
   return new Date().toISOString();
@@ -221,6 +222,17 @@ async function runRoleAction(currentCase, transition, options = {}) {
 
   if (providerConfig.kind === "file") {
     return runFileProvider(providerConfig, payload, currentCase, transition, { ...options, repoRoot });
+  }
+
+  if (providerConfig.kind === "openclaw-session") {
+    const result = await runOpenClawSessionProvider(providerConfig, payload, currentCase, transition, { ...options, repoRoot });
+    return normalizeRoleResult(currentCase, transition, {
+      ...result,
+      meta: {
+        provider: "openclaw-session",
+        ...(result.meta || {}),
+      },
+    }, options);
   }
 
   throw new Error(`unsupported provider kind '${providerConfig.kind}'`);

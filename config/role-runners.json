@@ -16,6 +16,17 @@
       "kind": "exec",
       "command": "node runtime/openclaw-session-bridge.example.js",
       "timeoutMs": 30000
+    },
+    "openclaw-session": {
+      "kind": "openclaw-session",
+      "requestDir": "runtime/bridge/openclaw-session/requests",
+      "responseDir": "runtime/bridge/openclaw-session/responses",
+      "runtime": "subagent",
+      "agentId": "openai-codex",
+      "sessionMode": "spawn",
+      "sessionLabelPrefix": "yamen-role",
+      "timeoutMs": 60000,
+      "pollIntervalMs": 1000
     }
   },
   "roles": {
@@ -26,13 +37,13 @@
       "provider": "stub"
     },
     "zhubu": {
-      "provider": "exec"
+      "provider": "openclaw-session"
     },
     "kuaishou": {
-      "provider": "stub"
+      "provider": "openclaw-session"
     },
     "dianshi": {
-      "provider": "stub"
+      "provider": "openclaw-session"
     },
     "zhangfang": {
       "provider": "stub"

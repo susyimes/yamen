@@ -630,6 +630,8 @@ yamen/
 - `docs/runtime-architecture.md`
 - `docs/p4-orchestrator-runbook.md`
 - `docs/role-executor-interface.md`
+- `docs/openclaw-session-provider.md`
+- `docs/openclaw-bridge-runbook.md`
 - `docs/phase1-runbook.md`
 - `docs/minimal-gap.md`
 - `config/bootstrap.json`

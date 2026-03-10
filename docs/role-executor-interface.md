@@ -17,7 +17,7 @@
 orchestrator
   -> role-runner
      -> provider adapter
-        -> stub | file | exec | future: openclaw-session
+        -> stub | file | exec | openclaw-session
 ```
 
 ## 输入：handoff payload
@@ -88,19 +88,22 @@ orchestrator
 - Python / Node / shell bridge
 - 未来 sessions bridge wrapper
 
-## 未来的 openclaw-session provider
+## openclaw-session provider
 
-建议未来新增：
+当前仓库已正式新增：
 - `kind: openclaw-session`
-- role-runner 根据 role 映射到主会话 / 子 session
-- handoff payload 转成结构化 prompt
-- 等待 session 返回 JSON 结果
+- role-runner 可根据 role 映射到 openclaw-session provider
+- handoff payload 会转成 session envelope + prompt
+- provider 通过 request/response bridge 等待 OpenClaw 写回 JSON 结果
 
-当前仓库已先落成两层可用设计：
-1. `exec` provider：可由外部 bridge 进程接 OpenClaw session 能力
-2. `file` provider：可由 watcher/relay 异步接入 OpenClaw
+这意味着：
+1. runtime 层已经认识 openclaw-session 这种执行后端
+2. OpenClaw bridge 只需要实现目录监听 + session 调度
+3. orchestrator 无需再改
 
-这样先把协议层稳定下来，再决定是不是把 OpenClaw 工具调用直接内嵌进 Node runtime。
+相关文档：
+- `docs/openclaw-session-provider.md`
+- `docs/openclaw-bridge-runbook.md`
 
 ## 配置文件
 

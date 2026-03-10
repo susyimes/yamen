@@ -1,0 +1,22 @@
+{
+  "role": "zhubu",
+  "action": "draft_case_note",
+  "note": "主簿已整理任务单并定义交付物。",
+  "completed": ["case_note_ready", "deliverables_defined"],
+  "pending": [],
+  "blockers": [],
+  "artifacts": [
+    {
+      "id": "example-task-note",
+      "type": "document",
+      "summary": "Task note drafted for the case",
+      "created_by": "zhubu"
+    }
+  ],
+  "reply_summary": "案件已成案，任务单已准备完成。",
+  "occurred_at": "2026-03-10T07:15:00.000Z",
+  "meta": {
+    "provider": "openclaw-session",
+    "sessionKey": "example-session-key"
+  }
+}

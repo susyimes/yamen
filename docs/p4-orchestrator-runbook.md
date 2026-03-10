@@ -80,6 +80,9 @@ node runtime/orchestrator.js step <case_id> submit_result
 ### 新增接口层
 - `config/role-runners.json`：角色到 provider 的映射
 - `docs/role-executor-interface.md`：真实调用接口设计
+- `docs/openclaw-session-provider.md`：OpenClaw session provider 协议
+- `docs/openclaw-bridge-runbook.md`：OpenClaw bridge 落地说明
+- `runtime/openclaw-session-provider.js`：openclaw-session provider 实现
 - `runtime/openclaw-session-bridge.example.js`：exec bridge 示例
 
 ## 设计说明
