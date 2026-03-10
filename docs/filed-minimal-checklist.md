@@ -7,11 +7,11 @@
 3. `node runtime/orchestrator.js step <case_id> open_filed_case`
 4. `node runtime/orchestrator.js step <case_id> draft_case_note`
 5. 用 `node runtime/openclaw-bridge-relay.js list/show` 读取 request
-6. 用 OpenClaw 角色 session 生成 `zhubu` JSON，写回 response
-7. 再执行 `draft_case_note`，让案件进入 `drafted`
-8. `node runtime/orchestrator.js step <case_id> execute_task`
-9. 用 OpenClaw 角色 session 生成 `kuaishou` JSON，写回 response
-10. 再执行 `execute_task` / `submit_result`，直到案件进入 `done`
+6. 可用 `node runtime/openclaw-bridge-relay.js scaffold-json <request-file>` 生成标准 response JSON 骨架
+7. 用 OpenClaw 角色 session 生成 `zhubu` / `kuaishou` JSON
+8. 用 `node runtime/openclaw-bridge-relay.js write-response <request-file> <response-json-path>` 写回 response
+9. 再执行对应的 orchestrator step，让案件继续推进
+10. 重复直到案件进入 `done`
 
 验收完成标志：
 - case 归档到 `cases/archive/`

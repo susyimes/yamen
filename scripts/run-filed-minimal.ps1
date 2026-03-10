@@ -26,7 +26,12 @@ node runtime/orchestrator.js step $caseId open_filed_case | Out-Host
 Write-Host "[4/5] wait for zhubu request"
 node runtime/orchestrator.js step $caseId draft_case_note
 
-Write-Host "Now use relay helper / OpenClaw session to produce response for zhubu, then rerun:"
+Write-Host "Now use relay helper / OpenClaw session to produce response for zhubu:"
+Write-Host "  node runtime/openclaw-bridge-relay.js list"
+Write-Host "  node runtime/openclaw-bridge-relay.js show <request-file>"
+Write-Host "  node runtime/openclaw-bridge-relay.js scaffold-json <request-file>"
+Write-Host "  node runtime/openclaw-bridge-relay.js write-response <request-file> <response-json-path>"
+Write-Host "Then continue with:"
 Write-Host "  node runtime/orchestrator.js step $caseId draft_case_note"
 Write-Host "  node runtime/orchestrator.js step $caseId execute_task"
 Write-Host "  node runtime/orchestrator.js step $caseId submit_result"

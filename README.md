@@ -578,11 +578,15 @@ node runtime/orchestrator.js step <case_id> classify_request
 node runtime/orchestrator.js step <case_id> open_filed_case
 node runtime/orchestrator.js step <case_id> draft_case_note
 
-# 3) 查看 bridge 请求
+# 3) 查看 bridge 请求 / 生成 response 骨架
 node runtime/openclaw-bridge-relay.js list
 node runtime/openclaw-bridge-relay.js show <request-file>
+node runtime/openclaw-bridge-relay.js scaffold-json <request-file>
 
-# 4) 用 OpenClaw 角色 session 产出 JSON，写回 response 后继续推进
+# 4) 用 OpenClaw 角色 session 产出 JSON，再一条命令写回 response
+node runtime/openclaw-bridge-relay.js write-response <request-file> <response-json-path>
+
+# 5) 继续推进到 done
 node runtime/orchestrator.js step <case_id> draft_case_note
 node runtime/orchestrator.js step <case_id> execute_task
 node runtime/orchestrator.js step <case_id> submit_result

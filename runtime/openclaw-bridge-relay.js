@@ -94,10 +94,6 @@ function buildFailureResponse(request, reason) {
   };
 }
 
-function usage() {
-  console.log(`OpenClaw Bridge Relay\n\nCommands:\n  list\n  show <request-file>\n  scaffold <request-file>\n  fail <request-file> <reason>\n  validate-response <response-file>\n`);
-}
-
 function validateRoleResult(data) {
   const required = ["role", "action", "note", "completed", "pending", "blockers", "artifacts", "reply_summary", "occurred_at"];
   const missing = required.filter((key) => !(key in data));
@@ -105,6 +101,23 @@ function validateRoleResult(data) {
     ok: missing.length === 0,
     missing,
   };
+}
+
+function printJson(value) {
+  console.log(JSON.stringify(value, null, 2));
+}
+
+function readJsonFromArg(arg) {
+  const trimmed = String(arg || "").trim();
+  if (!trimmed) throw new Error("Missing JSON argument");
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    return JSON.parse(trimmed);
+  }
+  return readJson(path.resolve(process.cwd(), trimmed));
+}
+
+function usage() {
+  console.log(`OpenClaw Bridge Relay\n\nCommands:\n  list\n  show <request-file>\n  scaffold <request-file>\n  scaffold-json <request-file>\n  fail <request-file> <reason>\n  write-response <request-file> <response-json-or-path>\n  validate-response <response-file>\n`);
 }
 
 function main() {
@@ -117,13 +130,13 @@ function main() {
   }
 
   if (command === 'list') {
-    console.log(JSON.stringify(listPending(), null, 2));
+    printJson(listPending());
     return;
   }
 
   if (command === 'show') {
     const request = readJson(requestPathFor(args[0]));
-    console.log(JSON.stringify(request, null, 2));
+    printJson(request);
     return;
   }
 
@@ -133,6 +146,12 @@ function main() {
     const out = responsePathFor(requestName);
     writeJson(out, buildScaffoldResponse(request));
     console.log(out);
+    return;
+  }
+
+  if (command === 'scaffold-json') {
+    const request = readJson(requestPathFor(args[0]));
+    printJson(buildScaffoldResponse(request));
     return;
   }
 
@@ -146,9 +165,31 @@ function main() {
     return;
   }
 
+  if (command === 'write-response') {
+    const requestName = args[0];
+    const request = readJson(requestPathFor(requestName));
+    const response = readJsonFromArg(args.slice(1).join(' '));
+    const check = validateRoleResult(response);
+    if (!check.ok) {
+      throw new Error(`Invalid role response. Missing fields: ${check.missing.join(', ')}`);
+    }
+    const out = responsePathFor(requestName);
+    writeJson(out, {
+      ...response,
+      meta: {
+        ...(response.meta || {}),
+        provider: "openclaw-session",
+        relay: "write-response",
+        label: request.session?.label || null,
+      },
+    });
+    console.log(out);
+    return;
+  }
+
   if (command === 'validate-response') {
     const data = readJson(path.join(RESPONSE_DIR, args[0]));
-    console.log(JSON.stringify(validateRoleResult(data), null, 2));
+    printJson(validateRoleResult(data));
     return;
   }
 
