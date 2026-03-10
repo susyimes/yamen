@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { buildManualHandoffText } = require("./handoff");
+const { buildBridgeBaseName } = require("./path-utils");
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
@@ -62,11 +63,19 @@ async function runOpenClawSessionProvider(providerConfig, payload, currentCase, 
   ensureDir(requestDir);
   ensureDir(responseDir);
 
-  const basename = `${currentCase.case_id}__${transition.action}__${payload.acting_role}`;
+  const basename = buildBridgeBaseName(currentCase.case_id, transition.action, payload.acting_role);
   const requestFile = path.join(requestDir, `${basename}.request.json`);
   const responseFile = path.join(responseDir, `${basename}.response.json`);
 
-  const envelope = buildSessionEnvelope(payload, providerConfig, transition);
+  const envelope = {
+    ...buildSessionEnvelope(payload, providerConfig, transition),
+    bridge: {
+      basename,
+      request_file: path.basename(requestFile),
+      response_file: path.basename(responseFile),
+      case_id: currentCase.case_id,
+    },
+  };
   fs.writeFileSync(requestFile, JSON.stringify(envelope, null, 2) + "\n", "utf8");
 
   const timeoutMs = providerConfig.timeoutMs || 60000;

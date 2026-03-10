@@ -51,6 +51,7 @@ function listPending() {
       action: request.transition?.action,
       session_mode: request.session?.mode,
       label: request.session?.label,
+      bridge_basename: request.bridge?.basename || null,
     };
   });
 }

@@ -565,6 +565,33 @@ Yamen 不适合所有任务。
 
 这一节只讲：**怎么把 Yamen 工程接进 OpenClaw。**
 
+### Quick Start：先跑通最小 filed 闭环
+
+在仓库根目录：
+
+```powershell
+# 1) 创建 filed 案件
+node runtime/orchestrator.js create runtime/sample-request.filed.json
+
+# 2) 推进到主簿
+node runtime/orchestrator.js step <case_id> classify_request
+node runtime/orchestrator.js step <case_id> open_filed_case
+node runtime/orchestrator.js step <case_id> draft_case_note
+
+# 3) 查看 bridge 请求
+node runtime/openclaw-bridge-relay.js list
+node runtime/openclaw-bridge-relay.js show <request-file>
+
+# 4) 用 OpenClaw 角色 session 产出 JSON，写回 response 后继续推进
+node runtime/orchestrator.js step <case_id> draft_case_note
+node runtime/orchestrator.js step <case_id> execute_task
+node runtime/orchestrator.js step <case_id> submit_result
+```
+
+如果想先走半自动顺序，见：
+- `docs/filed-minimal-checklist.md`
+- `scripts/run-filed-minimal.ps1`
+
 ### 第 1 步：把仓库放进 OpenClaw workspace
 保留这些文件结构：
 
@@ -633,6 +660,7 @@ yamen/
 - `docs/openclaw-session-provider.md`
 - `docs/openclaw-bridge-runbook.md`
 - `docs/openclaw-bridge-relay-implementation.md`
+- `docs/filed-minimal-checklist.md`
 - `docs/phase1-runbook.md`
 - `docs/minimal-gap.md`
 - `config/bootstrap.json`
