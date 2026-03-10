@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require("fs");
 const path = require("path");
+const { loadCase } = require("./case-store");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const BRIDGE_ROOT = path.join(REPO_ROOT, "runtime", "bridge", "openclaw-session");
@@ -116,8 +117,72 @@ function readJsonFromArg(arg) {
   return readJson(path.resolve(process.cwd(), trimmed));
 }
 
+function readJsonFromStdin() {
+  const input = fs.readFileSync(0, "utf8").trim();
+  if (!input) throw new Error("STDIN is empty");
+  return JSON.parse(input);
+}
+
+function buildNextHints() {
+  const pending = listPending().filter((item) => !item.has_response);
+  if (pending.length > 0) {
+    const first = pending[0];
+    return {
+      kind: "pending-request",
+      request_file: first.request_file,
+      case_id: first.case_id,
+      role: first.role,
+      action: first.action,
+      next_steps: [
+        `node runtime/openclaw-bridge-relay.js show ${first.request_file}`,
+        `node runtime/openclaw-bridge-relay.js scaffold-json ${first.request_file}`,
+        `node runtime/openclaw-bridge-relay.js write-response-stdin ${first.request_file}`
+      ]
+    };
+  }
+
+  return {
+    kind: "idle",
+    message: "No pending bridge request without response.",
+    next_steps: []
+  };
+}
+
+function buildFiledStepPlan(caseId) {
+  const currentCase = loadCase(REPO_ROOT, caseId);
+  const map = {
+    received: [
+      `node runtime/orchestrator.js step ${caseId} classify_request`,
+      `node runtime/orchestrator.js step ${caseId} open_filed_case`,
+      `node runtime/orchestrator.js step ${caseId} draft_case_note`
+    ],
+    triaged: [
+      `node runtime/orchestrator.js step ${caseId} open_filed_case`,
+      `node runtime/orchestrator.js step ${caseId} draft_case_note`
+    ],
+    accepted: [
+      `node runtime/orchestrator.js step ${caseId} draft_case_note`
+    ],
+    drafted: [
+      `node runtime/orchestrator.js step ${caseId} execute_task`
+    ],
+    executing: [
+      `node runtime/orchestrator.js step ${caseId} submit_result`
+    ],
+    done: []
+  };
+
+  return {
+    case_id: caseId,
+    status: currentCase.status,
+    current_role: currentCase.current_role,
+    reply_summary: currentCase.reply_summary,
+    suggested_steps: map[currentCase.status] || []
+  };
+}
+
 function usage() {
-  console.log(`OpenClaw Bridge Relay\n\nCommands:\n  list\n  show <request-file>\n  scaffold <request-file>\n  scaffold-json <request-file>\n  fail <request-file> <reason>\n  write-response <request-file> <response-json-or-path>\n  validate-response <response-file>\n`);
+  console.log(`OpenClaw Bridge Relay\n\nCommands:\n  list\n  show <request-file>\n  next\n  scaffold <request-file>\n  scaffold-json <request-file>\n  fail <request-file> <reason>\n  write-response <request-file> <response-json-or-path>\n  write-response-stdin <request-file>\n  step-filed <case_id>\n  validate-response <response-file>\n`);
 }
 
 function main() {
@@ -137,6 +202,11 @@ function main() {
   if (command === 'show') {
     const request = readJson(requestPathFor(args[0]));
     printJson(request);
+    return;
+  }
+
+  if (command === 'next') {
+    printJson(buildNextHints());
     return;
   }
 
@@ -187,6 +257,33 @@ function main() {
     return;
   }
 
+  if (command === 'write-response-stdin') {
+    const requestName = args[0];
+    const request = readJson(requestPathFor(requestName));
+    const response = readJsonFromStdin();
+    const check = validateRoleResult(response);
+    if (!check.ok) {
+      throw new Error(`Invalid role response. Missing fields: ${check.missing.join(', ')}`);
+    }
+    const out = responsePathFor(requestName);
+    writeJson(out, {
+      ...response,
+      meta: {
+        ...(response.meta || {}),
+        provider: "openclaw-session",
+        relay: "write-response-stdin",
+        label: request.session?.label || null,
+      },
+    });
+    console.log(out);
+    return;
+  }
+
+  if (command === 'step-filed') {
+    printJson(buildFiledStepPlan(args[0]));
+    return;
+  }
+
   if (command === 'validate-response') {
     const data = readJson(path.join(RESPONSE_DIR, args[0]));
     printJson(validateRoleResult(data));
@@ -206,4 +303,6 @@ module.exports = {
   buildScaffoldResponse,
   buildFailureResponse,
   validateRoleResult,
+  buildNextHints,
+  buildFiledStepPlan,
 };
