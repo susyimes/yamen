@@ -98,6 +98,17 @@ node scripts/relay-semi-auto.js <request-file>
 node scripts/relay-semi-auto.js <request-file> --stdin
 ```
 
+## 一键 filed 演练脚本
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1
+```
+
+常用参数：
+- `-RequestFile runtime/sample-request.filed.ascii.json`
+- `-AutoScaffold`（自动写 scaffold response，适合干跑）
+- `-AutoReport`（最后自动附加 entry report）
+
 ## 推荐起步方式
 
 第一阶段可以人工 bridge：

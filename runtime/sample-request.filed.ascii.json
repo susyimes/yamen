@@ -1,0 +1,12 @@
+{
+  "title": "debug-login-button-flaky",
+  "summary": "Investigate occasional no-response on login button click",
+  "raw_request": "Login button sometimes does not respond after click. Please investigate and provide fix notes.",
+  "source": {
+    "channel": "webchat"
+  },
+  "priority": "normal",
+  "risk_level": "medium",
+  "mode": "filed",
+  "needs_review": false
+}
