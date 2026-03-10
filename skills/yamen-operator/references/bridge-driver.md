@@ -99,4 +99,10 @@ If you want the next smallest real step, do this first:
 - add a helper that converts one `.request.json` into a ready-to-use OpenClaw `sessions_spawn` or `sessions_send` call payload
 - do not implement a background watcher yet
 
+This helper now exists:
+
+```bash
+node scripts/export-openclaw-session-payload.js <request-file>
+```
+
 That keeps debugging easy and respects the current architecture split.

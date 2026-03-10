@@ -1,0 +1,53 @@
+{
+  "protocol": "yamen.openclaw-session.v1",
+  "delivery": "openclaw-bridge",
+  "role": "zhubu",
+  "session": {
+    "mode": "spawn",
+    "label": "yamen-zhubu",
+    "runtime": "subagent",
+    "agentId": "main",
+    "timeoutMs": 60000,
+    "spawnMode": "reuse-or-spawn"
+  },
+  "transition": {
+    "from": "accepted",
+    "action": "draft_case_note",
+    "to": "drafted",
+    "next_role": "kuaishou"
+  },
+  "payload": {
+    "case_id": "20260310-180500-sample",
+    "title": "样例立案任务",
+    "mode": "filed",
+    "current_status": "accepted",
+    "target_status": "drafted",
+    "action_requested": "draft_case_note",
+    "acting_role": "zhubu",
+    "next_role": "kuaishou",
+    "risk_level": "medium",
+    "priority": "normal",
+    "summary": "为样例任务生成主簿任务单",
+    "raw_request": "请主簿整理任务单",
+    "completed": [],
+    "blockers": [],
+    "artifacts": [],
+    "reply_summary": ""
+  },
+  "prompt": "你现在扮演 Yamen 角色：zhubu。请只处理当前动作并只输出 JSON。",
+  "bridge": {
+    "basename": "sample-zhubu-draft",
+    "request_file": "sample-zhubu-draft.request.json",
+    "response_file": "sample-zhubu-draft.response.json",
+    "case_id": "20260310-180500-sample"
+  },
+  "role_session": {
+    "managedBy": "openclaw-session",
+    "enabled": true,
+    "sessionLabel": "yamen-zhubu",
+    "runtime": "subagent",
+    "agentId": "main",
+    "sessionMode": "spawn",
+    "spawnMode": "reuse-or-spawn"
+  }
+}
