@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "startup": {
+    "mainSessionActsAs": ["menfang", "xianling"],
+    "readOrder": [
+      "AGENTS.md",
+      "config/agents.json",
+      "config/routing.json",
+      "config/runtime-map.json",
+      "config/escalation.json",
+      "contracts/routing-modes.md",
+      "contracts/handoff.md",
+      "contracts/request-schema.md",
+      "contracts/permissions.md",
+      "contracts/states.md"
+    ],
+    "defaultModeSelection": {
+      "direct": [
+        "simple_query",
+        "light_edit",
+        "single_step_low_risk"
+      ],
+      "filed": [
+        "medium_task",
+        "needs_case_note",
+        "needs_executor"
+      ],
+      "reviewed": [
+        "external_action",
+        "sensitive_data",
+        "deployment_or_high_risk_change"
+      ]
+    },
+    "defaultExecution": {
+      "direct": {
+        "spawn": ["kuaishou"],
+        "replyBy": "mainSession"
+      },
+      "filed": {
+        "spawn": ["zhubu", "kuaishou"],
+        "replyBy": "mainSession"
+      },
+      "reviewed": {
+        "spawn": ["zhubu", "kuaishou", "dianshi"],
+        "replyBy": "mainSession"
+      }
+    }
+  }
+}

@@ -72,13 +72,15 @@ Yamen 不是缩水版 Edict，也不是大而全框架。
 - `cases/templates/*`：direct / filed / reviewed 模板
 - `config/agents.json`：角色注册
 
-为了让 Yamen 在 OpenClaw 中**基本顺利执行**，最少还需要这 3 个工程件：
+为了让 Yamen 在 OpenClaw 中**基本顺利执行**，最少需要补齐这些工程件：
 
 1. `config/routing.json`
 2. `config/runtime-map.json`
 3. `config/escalation.json`
+4. `config/bootstrap.json`
+5. `config/entrypoint.md`
 
-这 3 个文件现在也已经补上。
+这些文件现在都已经补上。
 
 ---
 
@@ -141,7 +143,12 @@ yamen/
 - 主会话能按需调用主簿 / 快手 / 典史
 - 角色交接遵循 `contracts/handoff.md`
 
-更详细的运行说明见：`docs/openclaw-runtime.md`
+更详细的运行说明见：
+
+- `docs/openclaw-runtime.md`
+- `docs/phase1-runbook.md`
+- `config/bootstrap.json`
+- `config/entrypoint.md`
 
 ---
 
