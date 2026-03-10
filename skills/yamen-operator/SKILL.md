@@ -27,14 +27,23 @@ The Yamen repo provides the rule layer. This skill provides the OpenClaw-native 
 
 ## Required rule sources
 
-Read as needed:
+Read core contracts/config as needed:
 - `contracts/case.schema.json`
 - `contracts/transitions.json`
 - `contracts/handoff.md`
 - `contracts/entry-output.schema.json`
+- `contracts/operator-status.schema.json`
+- `contracts/prefect-report.schema.json`
 - `config/runtime-map.json`
 - `config/role-sessions.json`
 - `docs/openclaw-integration-plan.md`
+
+Read operator references before driving a real flow:
+- `references/execution-flow.md`
+- `references/failure-handling.md`
+- `references/summary-report-contract.md`
+- `references/minimal-test.md`
+- `references/host-actions.md`
 
 ## Main workflow
 
@@ -55,6 +64,8 @@ Use OpenClaw-native session tools to:
 - send prompts/contracts to the right role
 - validate returned JSON shape
 - continue the next handoff
+- emit operator runtime status snapshots
+- send the final closure back through `yamen-entry`
 
 ## Do
 

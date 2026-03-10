@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/susyimes/yamen/contracts/operator-status.schema.json",
+  "title": "Yamen Operator Status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "phase",
+    "status",
+    "active_role",
+    "current_step",
+    "updated_at"
+  ],
+  "properties": {
+    "case_id": { "type": "string", "minLength": 1 },
+    "phase": {
+      "type": "string",
+      "enum": ["intake", "routing", "handoff", "execution", "review", "closure"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["running", "waiting", "completed", "degraded", "failed"]
+    },
+    "active_role": {
+      "type": "string",
+      "enum": ["prefect", "entry", "zhubu", "kuaishou", "dianshi"]
+    },
+    "current_step": { "type": "string", "minLength": 1 },
+    "mode": { "type": "string", "enum": ["direct", "filed", "reviewed"] },
+    "last_transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_status", "action", "to_status"],
+      "properties": {
+        "from_status": { "type": "string" },
+        "action": { "type": "string", "minLength": 1 },
+        "to_status": { "type": "string" },
+        "next_role": {
+          "type": "string",
+          "enum": ["entry", "zhubu", "kuaishou", "dianshi"]
+        }
+      }
+    },
+    "waiting_on": {
+      "type": "string",
+      "enum": ["entry", "zhubu", "kuaishou", "dianshi"]
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "failed_step", "retryable"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "failed_role": {
+          "type": "string",
+          "enum": ["entry", "zhubu", "kuaishou", "dianshi"]
+        },
+        "failed_step": { "type": "string", "minLength": 1 },
+        "retryable": { "type": "boolean" },
+        "operator_action_taken": { "type": "string" }
+      }
+    },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

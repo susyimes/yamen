@@ -13,3 +13,5 @@
 - `states.md`：案件状态机说明
 - `transitions.json`：机器可读的状态迁移表（角色动作 / 状态推进 / 下一责任角色）
 - `handoff.md`：Agent 间交接格式
+- `operator-status.schema.json`：operator 运行状态结构（控制面 / 故障面）
+- `prefect-report.schema.json`：给知府的统一回禀结构（业务面 / 收口面）
