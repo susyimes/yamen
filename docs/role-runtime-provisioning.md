@@ -38,9 +38,9 @@
 - `SOUL.md`：角色人格/职责文本
 - `role.json`：角色元信息（role id / label / runtime / purpose）
 - `README.md`：workspace 来源说明
-- `auth-profiles.json`：从主环境复制的一份最小 auth profiles
-- `memory/`：角色本地记忆目录
-- `logs/`：角色本地日志目录
+- `auth-profiles.json`：从主环境复制的一份最小 auth profiles（本地 provision，不入库）
+- `memory/`：角色本地记忆目录（本地状态）
+- `logs/`：角色本地日志目录（本地状态）
 
 ## auth 继承策略
 
@@ -48,7 +48,8 @@
 
 即：
 - 优先从主环境复制 `auth-profiles.json`
-- bootstrap 会尝试多个常见来源路径
+- 当前优先源为：`.openclaw/agents/main/agent/auth-profiles.json`
+- bootstrap 会继续尝试其他常见来源路径作为兜底
 - 若确实不存在，可用 `-Force` 先生成占位文件
 
 原因：

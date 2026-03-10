@@ -1,0 +1,9 @@
+# Local runtime workspaces and copied auth
+.openclaw/yamen-runtime/**/auth-profiles.json
+
+# Optional local runtime state
+.openclaw/yamen-runtime/**/memory/
+.openclaw/yamen-runtime/**/logs/
+
+# Local learnings
+.learnings/

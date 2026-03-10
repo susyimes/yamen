@@ -3,7 +3,7 @@
   "root": ".openclaw/yamen-runtime",
   "auth": {
     "strategy": "copy-main-profile",
-    "source": ".openclaw/auth-profiles.json",
+    "source": "..\\agents\\main\\agent\\auth-profiles.json",
     "targetName": "auth-profiles.json"
   },
   "entry": {

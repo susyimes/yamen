@@ -646,7 +646,7 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 - `SOUL.md`
 - `role.json`
 - `README.md`
-- `auth-profiles.json`（若主环境存在可复制源）
+- `auth-profiles.json`（优先从 `.openclaw/agents/main/agent/auth-profiles.json` 复制；仅本地 provision，不提交仓库）
 
 ### 第 4 步：主会话先读取这些文件
 至少读取：

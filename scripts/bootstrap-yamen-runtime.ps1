@@ -28,10 +28,15 @@ function Write-TextFile([string]$PathValue, [string]$Content) {
 }
 
 function Resolve-AuthSource([string]$RepoRootValue, [string]$ConfiguredSource) {
+  $workspaceParent = Split-Path -Parent $RepoRootValue
   $candidates = @(
     (Join-Path $RepoRootValue $ConfiguredSource),
-    (Join-Path (Split-Path -Parent $RepoRootValue) 'auth-profiles.json'),
-    (Join-Path (Split-Path -Parent $RepoRootValue) '.openclaw\auth-profiles.json'),
+    (Join-Path $workspaceParent $ConfiguredSource),
+    (Join-Path $workspaceParent 'agents\main\agent\auth-profiles.json'),
+    (Join-Path $workspaceParent 'agents\dae\agent\auth-profiles.json'),
+    (Join-Path $workspaceParent 'agents\unicorn\agent\auth-profiles.json'),
+    (Join-Path $workspaceParent 'auth-profiles.json'),
+    (Join-Path $workspaceParent '.openclaw\auth-profiles.json'),
     (Join-Path $env:USERPROFILE '.openclaw\auth-profiles.json')
   ) | Select-Object -Unique
 
@@ -118,10 +123,11 @@ foreach ($role in $roles) {
   Write-TextFile (Join-Path $workspacePath 'SOUL.md') (Get-RoleSoul $RepoRoot $role)
   Write-TextFile (Join-Path $workspacePath 'README.md') "# $role workspace`n`nProvisioned by bootstrap-yamen-runtime.ps1 for OpenClaw Yamen runtime.`n"
 
+  $authTarget = Join-Path $workspacePath $config.auth.targetName
   if ($sourceAuth) {
-    Copy-Item $sourceAuth (Join-Path $workspacePath $config.auth.targetName) -Force
+    Copy-Item $sourceAuth $authTarget -Force
   } elseif ($Force) {
-    Write-TextFile (Join-Path $workspacePath $config.auth.targetName) "{}"
+    Write-TextFile $authTarget "{}"
   }
 
   $summary += [pscustomobject]@{
