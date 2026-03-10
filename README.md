@@ -626,6 +626,7 @@ yamen/
 
 - `docs/openclaw-runtime.md`
 - `docs/runtime-architecture.md`
+- `docs/p4-orchestrator-runbook.md`
 - `docs/phase1-runbook.md`
 - `docs/minimal-gap.md`
 - `config/bootstrap.json`

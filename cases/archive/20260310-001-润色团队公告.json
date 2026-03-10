@@ -1,0 +1,62 @@
+{
+  "case_id": "20260310-001-润色团队公告",
+  "title": "润色团队公告",
+  "summary": "把一段团队公告改得更清楚",
+  "raw_request": "帮我把这段团队公告改得更清楚一点。",
+  "source": {
+    "channel": "webchat"
+  },
+  "priority": "normal",
+  "risk_level": "low",
+  "mode": "direct",
+  "status": "done",
+  "current_role": "xianling",
+  "owner_agent": "xianling",
+  "needs_review": false,
+  "blocking_issues": [],
+  "artifacts": [
+    {
+      "id": "20260310-001-润色团队公告-submit_result",
+      "type": "result",
+      "summary": "Execution result submitted for 20260310-001-润色团队公告",
+      "created_by": "kuaishou"
+    }
+  ],
+  "flow_log": [
+    {
+      "at": "2026-03-10T06:47:55.629Z",
+      "role": "menfang",
+      "action": "create_case",
+      "status": "received",
+      "note": "Case created by orchestrator",
+      "next_role": "menfang"
+    },
+    {
+      "at": "2026-03-10T06:48:00.010Z",
+      "role": "menfang",
+      "action": "classify_request",
+      "status": "triaged",
+      "note": "menfang executed classify_request for 润色团队公告",
+      "next_role": "xianling"
+    },
+    {
+      "at": "2026-03-10T06:48:00.065Z",
+      "role": "xianling",
+      "action": "route_direct",
+      "status": "executing",
+      "note": "xianling executed route_direct for 润色团队公告",
+      "next_role": "kuaishou"
+    },
+    {
+      "at": "2026-03-10T06:48:00.114Z",
+      "role": "kuaishou",
+      "action": "submit_result",
+      "status": "done",
+      "note": "kuaishou executed submit_result for 润色团队公告",
+      "next_role": "xianling"
+    }
+  ],
+  "reply_summary": "案件 20260310-001-润色团队公告 已完成主要处理。",
+  "created_at": "2026-03-10T06:47:55.629Z",
+  "updated_at": "2026-03-10T06:48:00.115Z"
+}

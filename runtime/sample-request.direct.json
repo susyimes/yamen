@@ -1,0 +1,12 @@
+{
+  "title": "润色团队公告",
+  "summary": "把一段团队公告改得更清楚",
+  "raw_request": "帮我把这段团队公告改得更清楚一点。",
+  "source": {
+    "channel": "webchat"
+  },
+  "priority": "normal",
+  "risk_level": "low",
+  "mode": "direct",
+  "needs_review": false
+}
