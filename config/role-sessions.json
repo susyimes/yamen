@@ -9,15 +9,25 @@
     "labelPrefix": "yamen-role"
   },
   "roles": {
-    "menfang": {
-      "managedBy": "main-session",
+    "entry": {
+      "managedBy": "openclaw-session",
       "enabled": true,
-      "actsInMainSession": true
+      "sessionLabel": "yamen-entry",
+      "runtime": "subagent",
+      "agentId": "main",
+      "sessionMode": "spawn",
+      "spawnMode": "reuse-or-spawn",
+      "purpose": "merged_menfang_xianling_entry"
+    },
+    "menfang": {
+      "managedBy": "entry-session",
+      "enabled": true,
+      "delegatedTo": "entry"
     },
     "xianling": {
-      "managedBy": "main-session",
+      "managedBy": "entry-session",
       "enabled": true,
-      "actsInMainSession": true
+      "delegatedTo": "entry"
     },
     "zhubu": {
       "managedBy": "openclaw-session",

@@ -53,15 +53,16 @@ function buildOperatorPayload(request, routing) {
     };
   }
 
+  const usePersistentSession = Boolean(request.session?.thread === true);
   return {
     tool: "sessions_spawn",
     payload: {
       runtime: routing.runtime,
       agentId: routing.agentId,
       label: routing.label,
-      mode: routing.spawnMode === "reuse-or-spawn" ? "session" : "run",
-      thread: false,
-      cleanup: routing.spawnMode === "reuse-or-spawn" ? "keep" : "delete",
+      mode: usePersistentSession ? "session" : "run",
+      thread: usePersistentSession,
+      cleanup: usePersistentSession ? "keep" : "delete",
       sandbox: "inherit",
       cwd: REPO_ROOT,
       task: request.prompt,

@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "root": ".openclaw/yamen-runtime",
+  "auth": {
+    "strategy": "copy-main-profile",
+    "source": ".openclaw/auth-profiles.json",
+    "targetName": "auth-profiles.json"
+  },
+  "entry": {
+    "sessionLabel": "yamen-entry",
+    "role": "menfang+xianling",
+    "managedBy": "openclaw-session",
+    "runtime": "subagent",
+    "agentId": "main",
+    "sessionMode": "spawn",
+    "spawnMode": "reuse-or-spawn"
+  },
+  "roles": {
+    "entry": {
+      "workspace": "workspace-entry",
+      "files": ["AGENTS.md", "SOUL.md", "role.json", "auth-profiles.json"]
+    },
+    "zhubu": {
+      "workspace": "workspace-zhubu",
+      "files": ["AGENTS.md", "SOUL.md", "role.json", "auth-profiles.json"]
+    },
+    "kuaishou": {
+      "workspace": "workspace-kuaishou",
+      "files": ["AGENTS.md", "SOUL.md", "role.json", "auth-profiles.json"]
+    },
+    "dianshi": {
+      "workspace": "workspace-dianshi",
+      "files": ["AGENTS.md", "SOUL.md", "role.json", "auth-profiles.json"]
+    }
+  }
+}

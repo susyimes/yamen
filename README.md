@@ -610,13 +610,16 @@ yamen/
 └─ docs/
 ```
 
-### 第 2 步：第一阶段先让主会话兼任两种角色
-第一阶段最推荐的运行方式：
+### 第 2 步：阶段 2 的正式接入模型
+推荐运行方式：
 
 ```text
-主会话 = 门房 + 县令
+主会话 = 知府 / 外部上级
+Yamen 入口 = 门房 + 县令（合并为 yamen-entry）
 按需调用 = 主簿 / 快手 / 典史
 ```
+
+也就是说，主会话不直接扮演 Yamen，而是向独立的 `yamen-entry` 系统下发任务。
 
 ### 第 3 步：主会话先读取这些文件
 至少读取：
@@ -658,8 +661,10 @@ yamen/
 
 - `config/role-runners.json`
 - `config/role-sessions.json`
+- `config/provisioning.json`
 
 - `docs/openclaw-runtime.md`
+- `docs/role-runtime-provisioning.md`
 - `docs/openclaw-integration-plan.md`
 - `docs/runtime-architecture.md`
 - `docs/p4-orchestrator-runbook.md`

@@ -3,14 +3,23 @@
   "openclaw": {
     "phase1": {
       "mainSession": {
+        "actsAs": ["prefect"],
+        "responsibilities": [
+          "submit_task_to_yamen_entry",
+          "review_status",
+          "receive_report"
+        ]
+      },
+      "yamenEntry": {
         "actsAs": ["menfang", "xianling"],
+        "label": "yamen-entry",
         "responsibilities": [
           "read_rules",
           "triage_request",
           "select_mode",
           "spawn_support_roles",
           "merge_results",
-          "reply_user"
+          "reply_prefect"
         ]
       },
       "spawnOnDemand": {

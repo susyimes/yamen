@@ -4,17 +4,22 @@
 
 当前接入模型：
 
-- 主会话：`menfang + xianling`
+- 主会话：`prefect / 知府 / 外部上级`
+- Yamen 入口 session：`entry = menfang + xianling`
 - 角色 session：`zhubu / kuaishou / dianshi`
 - 角色 session 规范：`config/role-sessions.json`
+- provisioning 规范：`config/provisioning.json`
 - role runner provider：`config/role-runners.json`
 
 ## 当前原则
 
-1. 主会话负责入口、判案、汇总回禀
-2. 支持角色通过 OpenClaw session 承接具体动作
-3. 角色 session 不需要长期常驻，但必须有固定身份规则
-4. 角色 session 的创建/复用规则由 `role-sessions.json` 统一定义
+1. 主会话负责以“知府”身份向 Yamen 下发任务，而不是直接充当 Yamen
+2. `yamen-entry` 负责门房 + 县令合并入口
+3. 支持角色通过 OpenClaw session 承接具体动作
+4. 角色 session 不需要长期常驻，但必须有固定身份规则与独立 workspace
+5. 角色 session 的创建/复用规则由 `role-sessions.json` 统一定义
+6. 角色运行环境 provisioning 由 `config/provisioning.json` 与 bootstrap 脚本定义
+7. 非线程场景下，operator payload 默认退化为 `sessions_spawn(mode="run")`，避免 OpenClaw session 约束不满足
 
 ## 角色层级
 

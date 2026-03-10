@@ -32,4 +32,8 @@ relay 层现在会结合 `config/role-sessions.json` 给出角色 session 路由
 - 要不要 send
 - 该连到哪个角色 session
 
-而是直接按 relay 建议执行。 
+而是直接按 relay 建议执行。
+
+当前约束：
+- 若 request 未声明 `thread:true`，relay 产出的 `sessions_spawn` payload 会默认用 `mode:"run"`
+- 只有显式线程化场景才会给出 `mode:"session" + thread:true`
