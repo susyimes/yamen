@@ -25,18 +25,19 @@ The source of truth for rules stays in the Yamen repo:
 ## Do
 
 1. Read provisioning and role-session config from the repo.
-2. Create/refresh provisioned workspaces for:
+2. Read `references/provisioning-checklist.md` before creating or refreshing workspaces.
+3. Create/refresh provisioned workspaces for:
    - entry
    - zhubu
    - kuaishou
    - dianshi
-3. Write minimal role runtime files:
+4. Write minimal role runtime files:
    - `role.json`
    - `AGENTS.md`
    - `SOUL.md`
    - `README.md`
-4. Inherit auth/profile from the main OpenClaw agent/runtime.
-5. Preserve labels and role identity:
+5. Inherit auth/profile from the main OpenClaw agent/runtime.
+6. Preserve labels and role identity:
    - `yamen-entry`
    - `yamen-zhubu`
    - `yamen-kuaishou`
@@ -55,6 +56,8 @@ Read these first:
 - `config/provisioning.json`
 - `config/role-sessions.json`
 - `docs/role-runtime-provisioning.md`
+- `references/provisioning-checklist.md`
+- `references/workspace-contract.md`
 
 Read role-specific SOUL when generating a workspace:
 - `agents/zhubu/SOUL.md`
@@ -72,4 +75,4 @@ Return a compact provisioning summary:
 
 ## Implementation note
 
-Treat repo `scripts/bootstrap-yamen-runtime.ps1` as a **reference implementation / fallback**, not as the final source of control. The target architecture is OpenClaw-native provisioning.
+Treat repo `scripts/bootstrap-yamen-runtime.ps1` as a **reference implementation / fallback**, not as the final source of control. See `scripts/reference-bootstrap.ps1` for the handoff note. The target architecture is OpenClaw-native provisioning.

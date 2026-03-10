@@ -569,7 +569,7 @@ Yamen 不适合所有任务。
 
 - **Yamen repo**：规则层 / 制度包
 - **OpenClaw**：运行层 / 宿主系统
-- **skills/yamen-provision**：负责角色运行环境 provisioning
+- **skills/yamen-provision**：负责角色运行环境 provisioning（优先实现）
 - **skills/yamen-operator**：负责知府 -> entry -> internal roles -> entry report 的内部流转
 
 ### Quick Start：先跑通最小 filed 闭环（当前过渡路径）
@@ -723,6 +723,8 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 - `docs/prefect-flow.md`
 - `docs/role-session-routing.md`
 - `skills/yamen-provision/SKILL.md`
+- `skills/yamen-provision/references/provisioning-checklist.md`
+- `skills/yamen-provision/references/workspace-contract.md`
 - `skills/yamen-operator/SKILL.md`
 
 **过渡层 / 参考实现**
