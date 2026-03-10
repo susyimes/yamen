@@ -22,7 +22,7 @@
       "requestDir": "runtime/bridge/openclaw-session/requests",
       "responseDir": "runtime/bridge/openclaw-session/responses",
       "runtime": "subagent",
-      "agentId": "openai-codex",
+      "agentId": "main",
       "sessionMode": "spawn",
       "sessionLabelPrefix": "yamen-role",
       "timeoutMs": 60000,
@@ -43,7 +43,7 @@
       "provider": "openclaw-session"
     },
     "dianshi": {
-      "provider": "openclaw-session"
+      "provider": "stub"
     },
     "zhangfang": {
       "provider": "stub"

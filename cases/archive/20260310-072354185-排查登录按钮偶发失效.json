@@ -1,0 +1,97 @@
+{
+  "case_id": "20260310-072354185-排查登录按钮偶发失效",
+  "title": "排查登录按钮偶发失效",
+  "summary": "排查登录页按钮偶尔点击没反应的问题",
+  "raw_request": "登录页按钮点击后偶尔没反应，帮我排查一下。",
+  "source": {
+    "channel": "webchat"
+  },
+  "priority": "normal",
+  "risk_level": "medium",
+  "mode": "filed",
+  "status": "done",
+  "current_role": "xianling",
+  "owner_agent": "xianling",
+  "needs_review": false,
+  "blocking_issues": [],
+  "artifacts": [
+    {
+      "id": "task-note-20260310-072354185-login-button",
+      "type": "document",
+      "summary": "案件任务单：排查登录按钮偶发失效",
+      "created_by": "zhubu",
+      "path": "runtime/bridge/openclaw-session/responses/20260310-072354185-排查登录按钮偶发失效__draft_case_note__zhubu.response.json"
+    },
+    {
+      "id": "execution-start-20260310-072354185-login-button",
+      "type": "note",
+      "summary": "快手已进入执行阶段，准备提交排查结论。",
+      "created_by": "kuaishou"
+    },
+    {
+      "id": "task-note-20260310-072354185-login-button",
+      "type": "document",
+      "summary": "案件任务单：排查登录按钮偶发失效",
+      "created_by": "zhubu"
+    },
+    {
+      "id": "result-20260310-072354185-login-button-investigation",
+      "type": "result",
+      "summary": "执行结论：问题大概率位于按钮点击链路不稳定，优先排查遮挡拦截、disabled/loading 状态误置、异步状态竞争及请求后缺少反馈。已形成修复建议与回归范围。",
+      "created_by": "kuaishou"
+    }
+  ],
+  "flow_log": [
+    {
+      "at": "2026-03-10T07:23:54.185Z",
+      "role": "menfang",
+      "action": "create_case",
+      "status": "received",
+      "note": "Case created by orchestrator",
+      "next_role": "menfang"
+    },
+    {
+      "at": "2026-03-10T07:23:58.048Z",
+      "role": "menfang",
+      "action": "classify_request",
+      "status": "triaged",
+      "note": "menfang executed classify_request for 排查登录按钮偶发失效",
+      "next_role": "xianling"
+    },
+    {
+      "at": "2026-03-10T07:23:58.099Z",
+      "role": "xianling",
+      "action": "open_filed_case",
+      "status": "accepted",
+      "note": "xianling executed open_filed_case for 排查登录按钮偶发失效",
+      "next_role": "zhubu"
+    },
+    {
+      "at": "2026-03-10T07:24:00.000Z",
+      "role": "zhubu",
+      "action": "draft_case_note",
+      "status": "drafted",
+      "note": "主簿已完成任务单整理，明确了排查目标、范围、子项、交付物与回禀草稿，可转快手执行。",
+      "next_role": "kuaishou"
+    },
+    {
+      "at": "2026-03-10T07:27:20.000Z",
+      "role": "kuaishou",
+      "action": "execute_task",
+      "status": "executing",
+      "note": "快手已接手任务单并开始执行，进入排查与结论整理阶段。",
+      "next_role": "kuaishou"
+    },
+    {
+      "at": "2026-03-10T07:27:00.000Z",
+      "role": "kuaishou",
+      "action": "submit_result",
+      "status": "done",
+      "note": "已按最小可运行验收完成本次交付，形成了执行结论、修复建议与回归范围，可回传县令。",
+      "next_role": "xianling"
+    }
+  ],
+  "reply_summary": "已完成最小验收交付：初步判断登录按钮偶发无响应主要集中在遮挡拦截、状态误置、异步竞争和请求无反馈四类问题，已给出排查优先级、修复建议和回归范围，可回传县令继续推进。",
+  "created_at": "2026-03-10T07:23:54.185Z",
+  "updated_at": "2026-03-10T07:32:33.470Z"
+}
