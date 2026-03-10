@@ -625,6 +625,7 @@ yamen/
 更详细的运行说明见：
 
 - `docs/openclaw-runtime.md`
+- `docs/runtime-architecture.md`
 - `docs/phase1-runbook.md`
 - `docs/minimal-gap.md`
 - `config/bootstrap.json`

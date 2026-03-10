@@ -20,7 +20,7 @@
 
 ## 下一步推荐
 
-1. 建 `config/agents.json`，把角色注册成可读配置
-2. 建最小 case 状态机实现
+1. 建最小 case 状态机实现
+2. 建运行架构说明：`docs/runtime-architecture.md`
 3. 建命令行或 API 驱动的流转入口
 4. 再补 FastAPI / SQLite / 简页面
