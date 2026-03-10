@@ -45,6 +45,7 @@ Read operator references before driving a real flow:
 - `references/minimal-test.md`
 - `references/host-actions.md`
 - `references/session-payloads.md`
+- `references/bridge-driver.md`
 
 Use local verification scripts when iterating:
 - `scripts/run-operator-smoke.js`
