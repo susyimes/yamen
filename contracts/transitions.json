@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "initialStatus": "received",
+  "terminalStatuses": ["done", "cancelled"],
+  "roles": ["menfang", "xianling", "zhubu", "kuaishou", "dianshi", "zhangfang"],
+  "modes": {
+    "direct": {
+      "description": "低风险、短链路、默认不经主簿与典史。",
+      "allowedStatuses": ["received", "triaged", "executing", "done", "cancelled"]
+    },
+    "filed": {
+      "description": "中等任务，需要主簿成案后再执行。",
+      "allowedStatuses": ["received", "triaged", "accepted", "drafted", "executing", "done", "cancelled"]
+    },
+    "reviewed": {
+      "description": "高风险任务，需要典史复核后才能结案。",
+      "allowedStatuses": ["received", "triaged", "accepted", "drafted", "executing", "review_pending", "returned", "done", "cancelled"]
+    }
+  },
+  "transitions": [
+    {
+      "from": "received",
+      "action": "classify_request",
+      "by": "menfang",
+      "to": "triaged",
+      "nextRole": "xianling",
+      "allowedModes": ["direct", "filed", "reviewed"],
+      "description": "门房完成受理、清洗输入、摘要与模式建议。"
+    },
+    {
+      "from": "triaged",
+      "action": "route_direct",
+      "by": "xianling",
+      "to": "executing",
+      "nextRole": "kuaishou",
+      "allowedModes": ["direct"],
+      "description": "县令判为直办，直接交快手执行。"
+    },
+    {
+      "from": "triaged",
+      "action": "open_filed_case",
+      "by": "xianling",
+      "to": "accepted",
+      "nextRole": "zhubu",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "县令正式立案，交主簿整理任务单。"
+    },
+    {
+      "from": "triaged",
+      "action": "reject_case",
+      "by": "xianling",
+      "to": "cancelled",
+      "nextRole": "xianling",
+      "allowedModes": ["direct", "filed", "reviewed"],
+      "description": "县令拒绝受理或终止处理。"
+    },
+    {
+      "from": "accepted",
+      "action": "draft_case_note",
+      "by": "zhubu",
+      "to": "drafted",
+      "nextRole": "kuaishou",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "主簿生成任务单、交付物说明和执行摘要。"
+    },
+    {
+      "from": "accepted",
+      "action": "request_missing_info",
+      "by": "zhubu",
+      "to": "returned",
+      "nextRole": "xianling",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "主簿发现信息不足，退回县令补材料或回问用户。"
+    },
+    {
+      "from": "drafted",
+      "action": "execute_task",
+      "by": "kuaishou",
+      "to": "executing",
+      "nextRole": "kuaishou",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "快手开始承办执行。"
+    },
+    {
+      "from": "executing",
+      "action": "submit_result",
+      "by": "kuaishou",
+      "to": "done",
+      "nextRole": "xianling",
+      "allowedModes": ["direct", "filed"],
+      "description": "快手提交结果；直办/立案模式可直接进入结案。"
+    },
+    {
+      "from": "executing",
+      "action": "submit_for_review",
+      "by": "kuaishou",
+      "to": "review_pending",
+      "nextRole": "dianshi",
+      "allowedModes": ["reviewed"],
+      "description": "快手提交结果，进入典史复核。"
+    },
+    {
+      "from": "executing",
+      "action": "report_blocker",
+      "by": "kuaishou",
+      "to": "returned",
+      "nextRole": "xianling",
+      "allowedModes": ["direct", "filed", "reviewed"],
+      "description": "快手汇报阻塞，退回县令协调。"
+    },
+    {
+      "from": "review_pending",
+      "action": "approve_result",
+      "by": "dianshi",
+      "to": "done",
+      "nextRole": "xianling",
+      "allowedModes": ["reviewed"],
+      "description": "典史复核通过，允许县令结案回禀。"
+    },
+    {
+      "from": "review_pending",
+      "action": "reject_result",
+      "by": "dianshi",
+      "to": "returned",
+      "nextRole": "kuaishou",
+      "allowedModes": ["reviewed"],
+      "description": "典史复核不通过，退回快手修正。"
+    },
+    {
+      "from": "returned",
+      "action": "reassign_case",
+      "by": "xianling",
+      "to": "accepted",
+      "nextRole": "zhubu",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "县令补齐信息或改判后，重新进入主簿整理。"
+    },
+    {
+      "from": "returned",
+      "action": "resume_direct_execution",
+      "by": "xianling",
+      "to": "executing",
+      "nextRole": "kuaishou",
+      "allowedModes": ["direct"],
+      "description": "县令协调后恢复直办执行。"
+    },
+    {
+      "from": "returned",
+      "action": "resume_filed_execution",
+      "by": "xianling",
+      "to": "drafted",
+      "nextRole": "kuaishou",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "县令确认材料已齐，恢复到可执行状态。"
+    },
+    {
+      "from": "received",
+      "action": "cancel_case",
+      "by": "xianling",
+      "to": "cancelled",
+      "nextRole": "xianling",
+      "allowedModes": ["direct", "filed", "reviewed"],
+      "description": "在早期阶段取消案件。"
+    },
+    {
+      "from": "accepted",
+      "action": "cancel_case",
+      "by": "xianling",
+      "to": "cancelled",
+      "nextRole": "xianling",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "立案后终止。"
+    },
+    {
+      "from": "drafted",
+      "action": "cancel_case",
+      "by": "xianling",
+      "to": "cancelled",
+      "nextRole": "xianling",
+      "allowedModes": ["filed", "reviewed"],
+      "description": "任务单已生成但决定终止。"
+    },
+    {
+      "from": "executing",
+      "action": "cancel_case",
+      "by": "xianling",
+      "to": "cancelled",
+      "nextRole": "xianling",
+      "allowedModes": ["direct", "filed", "reviewed"],
+      "description": "执行中由县令终止案件。"
+    },
+    {
+      "from": "review_pending",
+      "action": "cancel_case",
+      "by": "xianling",
+      "to": "cancelled",
+      "nextRole": "xianling",
+      "allowedModes": ["reviewed"],
+      "description": "复核阶段由县令终止案件。"
+    }
+  ]
+}

@@ -19,3 +19,5 @@
 ## 说明
 
 Yamen MVP 阶段不要求完整数据库实现，但所有 Agent 基础设施应围绕这些字段思考输出。
+
+> 机器可读版本见：`contracts/case.schema.json`

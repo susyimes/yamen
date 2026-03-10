@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/susyimes/yamen/contracts/case.schema.json",
+  "title": "Yamen Case",
+  "description": "Machine-readable case contract for Yamen runtime orchestration.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "title",
+    "summary",
+    "raw_request",
+    "source",
+    "priority",
+    "risk_level",
+    "mode",
+    "status",
+    "current_role",
+    "owner_agent",
+    "needs_review",
+    "artifacts",
+    "flow_log"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique case identifier, e.g. 20260310-001."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Short case title after intake/triage."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Normalized request summary for orchestration and handoff."
+    },
+    "raw_request": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Original user request text before normalization."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel"],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "description": "Inbound channel, e.g. webchat/discord/telegram."
+        },
+        "surface": {
+          "type": "string",
+          "description": "Optional surface or provider-specific entrypoint."
+        },
+        "user_id": {
+          "type": "string",
+          "description": "Optional upstream user identifier."
+        },
+        "session_id": {
+          "type": "string",
+          "description": "Optional conversation/session identifier."
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Optional original message identifier."
+        }
+      }
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["low", "normal", "high", "urgent"],
+      "description": "Operational priority used by xianling for ordering."
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Risk level used to determine review requirements."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["direct", "filed", "reviewed"],
+      "description": "Routing mode selected by menfang/xianling."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "received",
+        "triaged",
+        "accepted",
+        "drafted",
+        "executing",
+        "review_pending",
+        "returned",
+        "done",
+        "cancelled"
+      ],
+      "description": "Current workflow state."
+    },
+    "current_role": {
+      "type": "string",
+      "enum": ["menfang", "xianling", "zhubu", "kuaishou", "dianshi", "zhangfang"],
+      "description": "Role currently responsible for the next action."
+    },
+    "owner_agent": {
+      "type": "string",
+      "enum": ["menfang", "xianling", "zhubu", "kuaishou", "dianshi", "zhangfang"],
+      "description": "Primary accountable role/agent for the case."
+    },
+    "needs_review": {
+      "type": "boolean",
+      "description": "Whether the case must be reviewed by dianshi before completion."
+    },
+    "blocking_issues": {
+      "type": "array",
+      "description": "Known blockers preventing forward progress.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Outputs, files, links, drafts, or evidence attached to the case.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "summary"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": ["document", "code", "link", "image", "note", "result", "other"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "created_by": {
+            "type": "string",
+            "enum": ["menfang", "xianling", "zhubu", "kuaishou", "dianshi", "zhangfang"]
+          }
+        }
+      }
+    },
+    "flow_log": {
+      "type": "array",
+      "description": "Ordered event log of state transitions, handoffs, and important decisions.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["at", "role", "action", "status"],
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["menfang", "xianling", "zhubu", "kuaishou", "dianshi", "zhangfang"]
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Action name such as classify_request, route_case, execute_task."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "received",
+              "triaged",
+              "accepted",
+              "drafted",
+              "executing",
+              "review_pending",
+              "returned",
+              "done",
+              "cancelled"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "next_role": {
+            "type": "string",
+            "enum": ["menfang", "xianling", "zhubu", "kuaishou", "dianshi", "zhangfang"]
+          }
+        }
+      }
+    },
+    "reply_summary": {
+      "type": "string",
+      "description": "Latest external-facing summary prepared for the user."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
