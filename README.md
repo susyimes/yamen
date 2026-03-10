@@ -725,6 +725,10 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 - `skills/yamen-provision/SKILL.md`
 - `skills/yamen-provision/references/provisioning-checklist.md`
 - `skills/yamen-provision/references/workspace-contract.md`
+- `skills/yamen-provision/references/execution-flow.md`
+- `skills/yamen-provision/references/auth-inheritance.md`
+- `skills/yamen-provision/references/failure-handling.md`
+- `skills/yamen-provision/references/provisioning-summary-contract.md`
 - `skills/yamen-operator/SKILL.md`
 
 **过渡层 / 参考实现**

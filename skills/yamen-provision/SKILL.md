@@ -22,33 +22,22 @@ The source of truth for rules stays in the Yamen repo:
 - `agents/*/SOUL.md`
 - `contracts/*`
 
-## Do
+## Core workflow
 
-1. Read provisioning and role-session config from the repo.
-2. Read `references/provisioning-checklist.md` before creating or refreshing workspaces.
-3. Create/refresh provisioned workspaces for:
-   - entry
-   - zhubu
-   - kuaishou
-   - dianshi
-4. Write minimal role runtime files:
-   - `role.json`
-   - `AGENTS.md`
-   - `SOUL.md`
-   - `README.md`
-5. Inherit auth/profile from the main OpenClaw agent/runtime.
-6. Preserve labels and role identity:
-   - `yamen-entry`
-   - `yamen-zhubu`
-   - `yamen-kuaishou`
-   - `yamen-dianshi`
+Before provisioning, read:
+- `references/provisioning-checklist.md`
+- `references/workspace-contract.md`
+- `references/execution-flow.md`
+- `references/auth-inheritance.md`
+- `references/failure-handling.md`
+- `references/provisioning-summary-contract.md`
 
-## Do not
-
-- Do not execute case flow here.
-- Do not decide direct/filed/reviewed here.
-- Do not replace the Yamen contracts/config as source of truth.
-- Do not commit copied auth files into git.
+Then:
+1. validate prerequisites
+2. create/refresh role workspaces
+3. inherit auth/profile
+4. bind role identity and labels
+5. return compact provisioning summary
 
 ## Inputs
 
@@ -65,13 +54,24 @@ Read role-specific SOUL when generating a workspace:
 - `agents/dianshi/SOUL.md`
 - for entry, use the merged entry definition from provisioning docs/config
 
+## Do
+
+- Provision or refresh `entry / zhubu / kuaishou / dianshi`
+- Keep labels stable
+- Copy auth locally only
+- Report degraded or partial states honestly
+
+## Do not
+
+- Do not execute case flow here.
+- Do not decide direct/filed/reviewed here.
+- Do not replace the Yamen contracts/config as source of truth.
+- Do not commit copied auth files into git.
+
 ## Output
 
-Return a compact provisioning summary:
-- created / refreshed workspaces
-- labels bound
-- auth inheritance status
-- missing prerequisites
+Return a compact provisioning summary using the contract in:
+- `references/provisioning-summary-contract.md`
 
 ## Implementation note
 
