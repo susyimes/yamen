@@ -15,7 +15,7 @@ $roleSessionsPath = Join-Path $RepoRoot 'config\role-sessions.json'
 $config = Get-Content -Raw $configPath | ConvertFrom-Json
 $roleSessions = Get-Content -Raw $roleSessionsPath | ConvertFrom-Json
 
-$roles = @('entry', 'zhubu', 'kuaishou', 'dianshi')
+$roles = @('prefect', 'entry', 'zhubu', 'kuaishou', 'dianshi')
 
 function Ensure-Dir([string]$PathValue) {
   New-Item -ItemType Directory -Force -Path $PathValue | Out-Null
@@ -58,9 +58,9 @@ function Get-RoleSoul([string]$RepoRootValue, [string]$RoleId) {
 - 门房：受理、清洗输入、判断是否成案
 - 县令：判定 direct / filed / reviewed，决定是否调用主簿 / 快手 / 典史
 
-你不直接把自己暴露成“多个角色在吵架”，而是以一个干练的县衙入口对外办事。
+你不直接把自己暴露成多个角色在争论，而是以一个干练的县衙入口对内组织办理。
 
-你的上级不是普通用户，而是知府 / 外部上级会话。
+你的上级不是普通用户，而是 yamen-prefect 这样的上级会话。
 你负责接收知府下发任务，并在 Yamen 内部组织办理。
 "@
   }
@@ -86,7 +86,7 @@ This workspace is provisioned for Yamen role runtime.
 
 ## Rule
 Work only within the Yamen role boundary for this workspace.
-Do not assume the identity of prefect/main session.
+Do not assume the identity of raw main session.
 "@
 }
 
@@ -101,10 +101,33 @@ foreach ($role in $roles) {
   Ensure-Dir (Join-Path $workspacePath 'logs')
 
   $roleSession = $roleSessions.roles.$role
-  $roleLabel = if ($role -eq 'entry') { $config.entry.sessionLabel } else { $roleSession.sessionLabel }
-  $roleRuntime = if ($role -eq 'entry') { $config.entry.runtime } else { $roleSession.runtime }
-  $roleAgentId = if ($role -eq 'entry') { $config.entry.agentId } else { $roleSession.agentId }
-  $rolePurpose = if ($role -eq 'entry') { 'merged menfang+xianling entry for prefect-submitted tasks' } else { $roleSession.purpose }
+  if ($role -eq 'prefect') {
+    $roleLabel = $config.prefect.sessionLabel
+    $roleRuntime = $config.prefect.runtime
+    $roleAgentId = $config.prefect.agentId
+    $roleSessionMode = $config.prefect.sessionMode
+    $roleSpawnMode = $config.prefect.spawnMode
+    $rolePurpose = 'visible prefect/superior session for user-facing yamen access'
+    $roleManagedBy = 'openclaw-session'
+  }
+  elseif ($role -eq 'entry') {
+    $roleLabel = $config.entry.sessionLabel
+    $roleRuntime = $config.entry.runtime
+    $roleAgentId = $config.entry.agentId
+    $roleSessionMode = $config.entry.sessionMode
+    $roleSpawnMode = $config.entry.spawnMode
+    $rolePurpose = 'merged menfang+xianling entry for prefect-submitted tasks'
+    $roleManagedBy = 'openclaw-session'
+  }
+  else {
+    $roleLabel = $roleSession.sessionLabel
+    $roleRuntime = $roleSession.runtime
+    $roleAgentId = $roleSession.agentId
+    $roleSessionMode = $roleSession.sessionMode
+    $roleSpawnMode = $roleSession.spawnMode
+    $rolePurpose = $roleSession.purpose
+    $roleManagedBy = $roleSession.managedBy
+  }
 
   $roleJson = @{
     id = $role
@@ -112,10 +135,10 @@ foreach ($role in $roles) {
     workspace = $workspaceName
     runtime = $roleRuntime
     agentId = $roleAgentId
-    sessionMode = if ($role -eq 'entry') { $config.entry.sessionMode } else { $roleSession.sessionMode }
-    spawnMode = if ($role -eq 'entry') { $config.entry.spawnMode } else { $roleSession.spawnMode }
+    sessionMode = $roleSessionMode
+    spawnMode = $roleSpawnMode
     purpose = $rolePurpose
-    managedBy = if ($role -eq 'entry') { 'openclaw-session' } else { $roleSession.managedBy }
+    managedBy = $roleManagedBy
   } | ConvertTo-Json -Depth 6
 
   Write-TextFile (Join-Path $workspacePath 'role.json') $roleJson
@@ -126,7 +149,8 @@ foreach ($role in $roles) {
   $authTarget = Join-Path $workspacePath $config.auth.targetName
   if ($sourceAuth) {
     Copy-Item $sourceAuth $authTarget -Force
-  } elseif ($Force) {
+  }
+  elseif ($Force) {
     Write-TextFile $authTarget "{}"
   }
 

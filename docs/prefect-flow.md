@@ -3,11 +3,13 @@
 这条主路径用于阶段 2 的正式接入模型：
 
 ```text
-prefect (main session)
+external caller / main session
+-> yamen-prefect
 -> yamen-entry
 -> zhubu / kuaishou / dianshi
 -> yamen-entry report
--> prefect
+-> yamen-prefect
+-> external caller
 ```
 
 ## CLI
@@ -20,8 +22,8 @@ node runtime/prefect-flow.js report <case_id> <entry-report.json>
 
 ## 当前作用
 
-- `submit`：从知府口径创建案件，并把 entry / internal role workspace 挂进 case runtime 信息
-- `report`：把 `yamen-entry` 的统一回禀正式落回 case，形成 prefect 可读收口
+- `submit`：从 `yamen-prefect` 口径创建案件，并把 prefect / entry / internal role workspace 挂进 case runtime 信息
+- `report`：把 `yamen-entry` 的统一回禀正式落回 case，形成 `yamen-prefect` 可读收口
 
 ## 现在的定位
 

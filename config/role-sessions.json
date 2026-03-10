@@ -9,6 +9,16 @@
     "labelPrefix": "yamen-role"
   },
   "roles": {
+    "prefect": {
+      "managedBy": "openclaw-session",
+      "enabled": true,
+      "sessionLabel": "yamen-prefect",
+      "runtime": "subagent",
+      "agentId": "main",
+      "sessionMode": "session",
+      "spawnMode": "reuse-or-spawn",
+      "purpose": "visible_superior_agent_for_user_facing_yamen_entrypoint"
+    },
     "entry": {
       "managedBy": "openclaw-session",
       "enabled": true,

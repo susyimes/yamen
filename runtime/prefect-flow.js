@@ -23,13 +23,18 @@ function submitToEntry(request) {
     ...request,
     source: {
       ...(request.source || {}),
-      submitted_by: "prefect",
+      submitted_by: "yamen-prefect",
+      prefect_label: "yamen-prefect",
       entry_label: "yamen-entry",
     },
   });
 
   currentCase.runtime = {
-    model: "prefect-yamen-entry",
+    model: "yamen-prefect-entry",
+    prefect: {
+      label: "yamen-prefect",
+      workspace: getProvisionedWorkspace(REPO_ROOT, "prefect"),
+    },
     entry: {
       label: "yamen-entry",
       workspace: getProvisionedWorkspace(REPO_ROOT, "entry"),
@@ -46,10 +51,11 @@ function submitToEntry(request) {
 
   return {
     case_id: currentCase.case_id,
-    submitted_by: "prefect",
+    submitted_by: "yamen-prefect",
     next_session: "yamen-entry",
+    prefect_workspace: currentCase.runtime.prefect.workspace,
     entry_workspace: currentCase.runtime.entry.workspace,
-    suggested_next_action: "handoff_to_entry",
+    suggested_next_action: "yamen_prefect_handoff_to_entry",
     case: currentCase,
   };
 }
@@ -66,8 +72,8 @@ function attachEntryReport(caseId, report) {
     role: "entry",
     action: "close_and_report",
     status: currentCase.status,
-    note: report.summary || "entry reported to prefect",
-    next_role: "prefect",
+    note: report.summary || "entry reported to yamen-prefect",
+    next_role: "xianling",
   });
   updateCaseForRuntime(caseId, currentCase);
   return currentCase;

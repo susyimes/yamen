@@ -4,7 +4,7 @@ Use this flow when running Yamen inside OpenClaw.
 
 ## 1. Prefect intake
 
-Input arrives from the prefect/main session.
+Input arrives from the visible `yamen-prefect` session, not directly from the raw main session.
 
 Required operator actions:
 - normalize the raw request into a case draft
@@ -28,34 +28,34 @@ Decision rules:
 ### direct
 
 ```text
-prefect
+yamen-prefect
 -> yamen-entry intake
 -> kuaishou execute
 -> yamen-entry closure/report
--> prefect
+-> yamen-prefect
 ```
 
 ### filed
 
 ```text
-prefect
+yamen-prefect
 -> yamen-entry intake
 -> zhubu draft case note
 -> kuaishou execute
 -> yamen-entry closure/report
--> prefect
+-> yamen-prefect
 ```
 
 ### reviewed
 
 ```text
-prefect
+yamen-prefect
 -> yamen-entry intake
 -> zhubu draft case note
 -> kuaishou execute
 -> dianshi review
 -> yamen-entry closure/report
--> prefect
+-> yamen-prefect
 ```
 
 ## 4. Entry closure

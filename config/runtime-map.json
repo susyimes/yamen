@@ -3,11 +3,22 @@
   "openclaw": {
     "phase1": {
       "mainSession": {
-        "actsAs": ["prefect"],
+        "actsAs": ["external-caller"],
         "responsibilities": [
+          "open_or_reach_yamen_prefect",
+          "observe_visible_yamen_agent_threads"
+        ]
+      },
+      "yamenPrefect": {
+        "actsAs": ["prefect"],
+        "label": "yamen-prefect",
+        "visibility": "openclaw-standard-visible",
+        "responsibilities": [
+          "receive_user_visible_tasks",
           "submit_task_to_yamen_entry",
           "review_status",
-          "receive_report"
+          "receive_entry_report",
+          "reply_back_to_user"
         ]
       },
       "yamenEntry": {

@@ -1,6 +1,6 @@
 ---
 name: yamen-operator
-description: Run Yamen as an internal OpenClaw work mode. Use when a prefect/main session wants to submit a task into Yamen, have yamen-entry intake and route it, invoke zhubu/kuaishou/dianshi as needed through OpenClaw sessions, and return a unified report back to the prefect. This skill executes case logic using Yamen contracts/config as the rule layer.
+description: Run Yamen as an internal OpenClaw work mode. Use when a visible `yamen-prefect` session wants to submit a task into Yamen, have yamen-entry intake and route it, invoke zhubu/kuaishou/dianshi as needed through OpenClaw sessions, and return a unified report back to `yamen-prefect`. This skill executes case logic using Yamen contracts/config as the rule layer.
 ---
 
 # Yamen Operator
@@ -11,7 +11,7 @@ Run Yamen **inside OpenClaw**.
 
 This skill is the runtime operator that connects:
 
-- prefect/main session
+- `yamen-prefect`
 - `yamen-entry`
 - `yamen-zhubu`
 - `yamen-kuaishou`
@@ -21,7 +21,7 @@ The Yamen repo provides the rule layer. This skill provides the OpenClaw-native 
 
 ## Core model
 
-- prefect/main session = external superior
+- `yamen-prefect` = OpenClaw-standard visible superior agent
 - `yamen-entry` = merged menfang + xianling
 - `zhubu / kuaishou / dianshi` = internal role sessions
 

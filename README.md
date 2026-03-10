@@ -570,7 +570,7 @@ Yamen 不适合所有任务。
 - **Yamen repo** = 规则层
 - **OpenClaw** = 运行层
 - **`skills/yamen-provision`** = 角色运行环境 provisioning
-- **`skills/yamen-operator`** = 内部执行 skill，负责 `prefect -> entry -> internal roles -> entry report`
+- **`skills/yamen-operator`** = 内部执行 skill，负责 `yamen-prefect -> entry -> internal roles -> entry report`
 
 也就是说：
 - repo 负责 contract / transitions / references
@@ -589,6 +589,7 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 
 它会在 `.openclaw/yamen-runtime/` 下生成：
 
+- `workspace-prefect`
 - `workspace-entry`
 - `workspace-zhubu`
 - `workspace-kuaishou`
@@ -650,14 +651,16 @@ powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 
 推荐运行方式：
 
 ```text
-main session = prefect / external superior
+main session = external caller / OpenClaw host surface
+visible superior session = yamen-prefect
 entry session = menfang + xianling (merged as yamen-entry)
 internal role sessions = zhubu / kuaishou / dianshi
 ```
 
 也就是说：
 - 主会话不直接扮演 Yamen
-- 主会话向独立的 `yamen-entry` 提交案件
+- 用户先进入 OpenClaw 标准可见层上的 `yamen-prefect`
+- `yamen-prefect` 再向独立的 `yamen-entry` 提交案件
 - `yamen-entry` 决定 `direct / filed / reviewed`
 - 再按需调 `zhubu / kuaishou / dianshi`
 
@@ -694,11 +697,13 @@ node scripts/relay-semi-auto.js <request-file> --stdin
 现在 repo 里的主路径是：
 
 ```text
-prefect (main session)
+external caller
+-> yamen-prefect
 -> yamen-entry
 -> zhubu / kuaishou / dianshi
 -> yamen-entry report
--> prefect
+-> yamen-prefect
+-> external caller
 ```
 
 可直接用：
@@ -727,7 +732,8 @@ node runtime/prefect-flow.js report <case_id> <entry-report.json>
 
 满足下面几条，就说明 Yamen 已经以“规则层 + 运行层”方式接进 OpenClaw：
 
-- 主会话能以 prefect 身份提交案件
+- 用户能通过 OpenClaw 标准界面进入 `yamen-prefect`
+- `yamen-prefect` 能以知府/上级身份提交案件
 - `yamen-entry` 能输出合法 intake / report 结构
 - `zhubu / kuaishou / dianshi` 能通过 OpenClaw session 或 bridge 被调用
 - 角色交接遵循 `contracts/handoff.md`

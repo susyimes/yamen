@@ -6,6 +6,15 @@
     "source": "..\\agents\\main\\agent\\auth-profiles.json",
     "targetName": "auth-profiles.json"
   },
+  "prefect": {
+    "sessionLabel": "yamen-prefect",
+    "role": "prefect",
+    "managedBy": "openclaw-session",
+    "runtime": "subagent",
+    "agentId": "main",
+    "sessionMode": "session",
+    "spawnMode": "reuse-or-spawn"
+  },
   "entry": {
     "sessionLabel": "yamen-entry",
     "role": "menfang+xianling",
@@ -16,6 +25,10 @@
     "spawnMode": "reuse-or-spawn"
   },
   "roles": {
+    "prefect": {
+      "workspace": "workspace-prefect",
+      "files": ["AGENTS.md", "SOUL.md", "role.json", "auth-profiles.json"]
+    },
     "entry": {
       "workspace": "workspace-entry",
       "files": ["AGENTS.md", "SOUL.md", "role.json", "auth-profiles.json"]

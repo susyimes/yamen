@@ -8,7 +8,8 @@
 - 主会话 = Yamen
 
 而是：
-- **主会话 = 知府 / 外部上级**
+- **主会话 = 普通 OpenClaw 外部入口**
+- **`yamen-prefect` = OpenClaw 标准可见层上的知府 / 外部上级**
 - **Yamen = 独立运行系统**
 - **Yamen 入口 = 门房 + 县令合并的 entry session**
 
@@ -20,6 +21,7 @@
 
 ```text
 .openclaw/yamen-runtime/
+├─ workspace-prefect/
 ├─ workspace-entry/
 ├─ workspace-zhubu/
 ├─ workspace-kuaishou/
@@ -27,6 +29,7 @@
 ```
 
 其中：
+- `workspace-prefect`：对用户可见的知府 / 外部上级运行环境
 - `workspace-entry`：门房+县令合并入口
 - `workspace-zhubu`：主簿运行环境
 - `workspace-kuaishou`：快手运行环境
@@ -56,18 +59,25 @@
 - 先保证角色 workspace 能实际发起会话
 - 先解决“逻辑配置存在，但运行时无模型/鉴权”的问题
 
-## entry session
+## prefect + entry sessions
 
-新的核心角色不是 main session，而是：
+新的核心角色不再是 main session，而是：
+- `yamen-prefect`
 - `yamen-entry`
 
-它承担：
+其中 `yamen-prefect` 承担：
+- 对用户可见的上级窗口
+- 接收任务
+- 提交给 `yamen-entry`
+- 接收回禀并回复用户
+
+其中 `yamen-entry` 承担：
 - 门房受理
 - 县令判案
 - 创建 case
 - 决定 direct / filed / reviewed
 - 调用 zhubu / kuaishou / dianshi
-- 向知府/主会话回禀
+- 向 `yamen-prefect` 回禀
 
 ## bootstrap 当前行为
 

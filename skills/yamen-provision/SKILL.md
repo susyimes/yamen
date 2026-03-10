@@ -11,6 +11,7 @@ Provision Yamen as an **internal OpenClaw work mode**, not as a standalone repo 
 
 Create or refresh the role runtime environments that OpenClaw will use to run Yamen internally:
 
+- `yamen-prefect` (OpenClaw-standard visible superior agent)
 - `yamen-entry`
 - `yamen-zhubu`
 - `yamen-kuaishou`
@@ -58,7 +59,7 @@ Read role-specific SOUL when generating a workspace:
 
 ## Do
 
-- Provision or refresh `entry / zhubu / kuaishou / dianshi`
+- Provision or refresh `prefect / entry / zhubu / kuaishou / dianshi`
 - Keep labels stable
 - Copy auth locally only
 - Report degraded or partial states honestly

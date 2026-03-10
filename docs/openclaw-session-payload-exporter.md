@@ -50,4 +50,5 @@ node scripts/export-openclaw-session-payload.js runtime/sample-openclaw-session.
 This keeps the architecture clean:
 - Yamen repo still defines contracts and routing rules
 - OpenClaw still owns execution
+- `yamen-prefect` can stay user-visible while internal roles remain behind the bridge
 - bridge helpers stay thin and debuggable

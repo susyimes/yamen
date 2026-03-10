@@ -8,7 +8,8 @@ Yamen 现在重新定位为：
 
 当前接入模型：
 
-- 主会话：`prefect / 知府 / 外部上级`
+- 主会话：普通 OpenClaw 外部入口，不直接承担 Yamen 身份
+- 可见上级 session：`yamen-prefect`（知府 / 外部上级）
 - Yamen 入口 session：`entry = menfang + xianling`
 - entry 输出契约：`contracts/entry-output.schema.json`
 - 角色 session：`zhubu / kuaishou / dianshi`
@@ -19,8 +20,9 @@ Yamen 现在重新定位为：
 
 ## 当前原则
 
-1. 主会话负责以“知府”身份向 Yamen 下发任务，而不是直接充当 Yamen
-2. `yamen-entry` 负责门房 + 县令合并入口
+1. 主会话不直接扮演知府；`yamen-prefect` 才是 OpenClaw 标准可见层上的上级角色
+2. `yamen-prefect` 对用户可见，并负责把任务正式提交给 `yamen-entry`
+3. `yamen-entry` 负责门房 + 县令合并入口
 3. 支持角色通过 OpenClaw session 承接具体动作
 4. 角色 session 不需要长期常驻，但必须有固定身份规则与独立 workspace
 5. 角色 session 的创建/复用规则由 `role-sessions.json` 统一定义
@@ -30,8 +32,8 @@ Yamen 现在重新定位为：
 
 ## 角色层级
 
-### 主会话内角色
-- `prefect`
+### OpenClaw 标准可见层
+- `yamen-prefect`
 
 ### Yamen 入口 session
 - `entry = menfang + xianling`

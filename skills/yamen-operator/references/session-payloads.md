@@ -2,13 +2,15 @@
 
 Use these payload shapes when driving Yamen roles through OpenClaw session tools.
 
-## 1. Prefect -> yamen-entry intake payload
+## 1. yamen-prefect -> yamen-entry intake payload
 
-Use when sending a new case into `yamen-entry`.
+Use when the user-visible `yamen-prefect` session sends a new case into `yamen-entry`.
 
 ```json
 {
   "protocol": "yamen.operator.intake.v1",
+  "sender_role": "prefect",
+  "sender_label": "yamen-prefect",
   "target_role": "entry",
   "task": "intake_and_route",
   "case": {
@@ -101,7 +103,7 @@ Use for:
 
 ## 5. Entry closure payload
 
-Send all accepted internal role outputs back to `yamen-entry` in one package.
+Send all accepted internal role outputs back to `yamen-entry` in one package, then let `yamen-entry` report upward to `yamen-prefect`.
 
 `route_taken` should be the deduplicated role path, for example:
 - direct: `["entry", "kuaishou"]`
@@ -126,3 +128,4 @@ Send all accepted internal role outputs back to `yamen-entry` in one package.
 - `yamen-entry` intake output -> validate against `contracts/entry-output.schema.json`
 - internal role output -> validate against the role result contract described in `docs/role-executor-interface.md`
 - final closure output -> validate against `contracts/prefect-report.schema.json`
+- final user-visible reply should be delivered by `yamen-prefect`, not by raw main session impersonation

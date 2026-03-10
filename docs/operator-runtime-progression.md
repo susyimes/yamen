@@ -6,6 +6,7 @@ This document records the staged path from contracts to real OpenClaw execution.
 
 - Yamen repo = 规则层
 - OpenClaw = 运行层
+- `yamen-prefect` = OpenClaw 标准可见层上的知府 / 上级 agent
 - yamen-operator = 内部执行 skill
 
 ## Current completed pieces
