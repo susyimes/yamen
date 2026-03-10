@@ -45,6 +45,59 @@
 - bridge 应做一次清洗/抽取
 - 若仍失败，则写回一个 blocker 结果，而不是让 orchestrator 卡死
 
+## 标准操作流（list -> show -> export -> execute -> write-response）
+
+推荐统一按下面步骤走一轮：
+
+1. 列待处理 request
+
+```bash
+node runtime/openclaw-bridge-relay.js list
+```
+
+2. 看一个 request 明细
+
+```bash
+node runtime/openclaw-bridge-relay.js show <request-file>
+```
+
+3. 导出可直接执行的 OpenClaw session tool 参数草案
+
+```bash
+node scripts/export-openclaw-session-payload.js <request-file>
+```
+
+输出会给出：
+- `suggested_tool` (`sessions_spawn` / `sessions_send`)
+- `directly_executable_args`
+
+4. 在 OpenClaw 中执行对应 tool（用上一步的参数）
+
+5. 把角色 JSON 写回 response
+
+```bash
+node runtime/openclaw-bridge-relay.js write-response-stdin <request-file>
+```
+
+把 role JSON 粘贴进 STDIN 即可。
+
+## 半自动脚本（压缩步骤）
+
+```bash
+node scripts/relay-semi-auto.js <request-file>
+```
+
+它会：
+- 自动 export 参数草案
+- 打印可执行的 tool 参数
+- 提示如何写回 response
+
+如需“一次命令 + 从 STDIN 写回 response”，可用：
+
+```bash
+node scripts/relay-semi-auto.js <request-file> --stdin
+```
+
 ## 推荐起步方式
 
 第一阶段可以人工 bridge：
