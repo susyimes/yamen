@@ -10,7 +10,13 @@
 - `runtime/transition-engine.js`
 - `runtime/case-store.js`
 - `runtime/role-runner.js`
+- `runtime/handoff.js`
 - `runtime/types.js`
+
+角色执行层已升级为 adapter 结构：
+- `stub`：本地模拟
+- `file`：文件桥接
+- `exec`：命令执行桥接
 
 它的定位不是完整业务系统，而是：
 
@@ -51,6 +57,11 @@ node runtime/orchestrator.js step <case_id> submit_result
 
 ## 当前能力边界
 
+当前已验证两条路径：
+- `stub` provider：本地 direct 流程可跑通
+- `exec` provider：`zhubu` 可通过 bridge 示例完成 `draft_case_note`
+
+
 ### 已具备
 - 创建案件
 - 列出活跃案件
@@ -61,11 +72,15 @@ node runtime/orchestrator.js step <case_id> submit_result
 
 ### 还没有
 - 严格 JSON Schema 校验
-- 真正的角色会话调用
-- 与 `sessions_spawn` 的集成
+- 原生 OpenClaw `sessions_spawn` / `sessions_send` provider
 - 守卫条件（guards）
 - 自动策略决策
 - API / DB / UI
+
+### 新增接口层
+- `config/role-runners.json`：角色到 provider 的映射
+- `docs/role-executor-interface.md`：真实调用接口设计
+- `runtime/openclaw-session-bridge.example.js`：exec bridge 示例
 
 ## 设计说明
 

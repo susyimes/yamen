@@ -19,16 +19,17 @@ function slugTitle(text) {
     .slice(0, 32) || "case";
 }
 
-function nextSequence() {
-  ensureCaseDirs(REPO_ROOT);
-  const existing = listActiveCases(REPO_ROOT);
-  return String(existing.length + 1).padStart(3, "0");
+function buildCaseId(request, createdAt) {
+  const compact = createdAt.replace(/[-:TZ.]/g, "");
+  const datePart = compact.slice(0, 8);
+  const timePart = compact.slice(8, 14);
+  const milliPart = compact.slice(14, 17);
+  return `${datePart}-${timePart}${milliPart}-${slugTitle(request.title || request.summary || request.raw_request)}`;
 }
 
 function createCase(request) {
   const createdAt = nowIso();
-  const datePrefix = createdAt.slice(0, 10).replace(/-/g, "");
-  const caseId = `${datePrefix}-${nextSequence()}-${slugTitle(request.title || request.summary || request.raw_request)}`;
+  const caseId = buildCaseId(request, createdAt);
 
   const currentCase = {
     case_id: caseId,
@@ -104,7 +105,7 @@ function applyTransition(currentCase, transition, roleResult) {
   return currentCase;
 }
 
-function stepCase(caseId, action) {
+async function stepCase(caseId, action) {
   const transitions = loadTransitions(REPO_ROOT);
   const currentCase = loadCase(REPO_ROOT, caseId);
   const transition = getTransitionByAction(transitions, currentCase, action);
@@ -114,7 +115,7 @@ function stepCase(caseId, action) {
     throw new Error(`Action '${action}' is not allowed for case ${caseId} at status '${currentCase.status}'. Allowed: ${allowed.join(", ")}`);
   }
 
-  const roleResult = runRoleAction(currentCase, transition, { now: nowIso() });
+  const roleResult = await runRoleAction(currentCase, transition, { now: nowIso(), repoRoot: REPO_ROOT });
   return applyTransition(currentCase, transition, roleResult);
 }
 
@@ -130,7 +131,7 @@ function usage() {
   console.log(`Yamen Orchestrator\n\nCommands:\n  create <request.json>    Create a new case from request JSON\n  step <case_id> <action> Advance a case by action\n  show <case_id>           Show one case\n  list                     List active cases\n  allowed <case_id>        Show allowed actions for a case\n`);
 }
 
-function main() {
+async function main() {
   const [command, ...args] = process.argv.slice(2);
   ensureCaseDirs(REPO_ROOT);
 
@@ -146,7 +147,7 @@ function main() {
   }
 
   if (command === "step") {
-    printJson(stepCase(args[0], args[1]));
+    printJson(await stepCase(args[0], args[1]));
     return;
   }
 
@@ -172,7 +173,10 @@ function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error(error.stack || error.message || String(error));
+    process.exit(1);
+  });
 }
 
 module.exports = {

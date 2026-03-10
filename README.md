@@ -624,9 +624,12 @@ yamen/
 
 更详细的运行说明见：
 
+- `config/role-runners.json`
+
 - `docs/openclaw-runtime.md`
 - `docs/runtime-architecture.md`
 - `docs/p4-orchestrator-runbook.md`
+- `docs/role-executor-interface.md`
 - `docs/phase1-runbook.md`
 - `docs/minimal-gap.md`
 - `config/bootstrap.json`

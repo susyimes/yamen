@@ -1,0 +1,12 @@
+{
+  "title": "排查登录按钮偶发失效",
+  "summary": "排查登录页按钮偶尔点击没反应的问题",
+  "raw_request": "登录页按钮点击后偶尔没反应，帮我排查一下。",
+  "source": {
+    "channel": "webchat"
+  },
+  "priority": "normal",
+  "risk_level": "medium",
+  "mode": "filed",
+  "needs_review": false
+}

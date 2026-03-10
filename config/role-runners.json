@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "defaultProvider": "stub",
+  "providers": {
+    "stub": {
+      "kind": "stub"
+    },
+    "file": {
+      "kind": "file",
+      "requestDir": "runtime/bridge/requests",
+      "responseDir": "runtime/bridge/responses",
+      "timeoutMs": 1000,
+      "pollIntervalMs": 100
+    },
+    "exec": {
+      "kind": "exec",
+      "command": "node runtime/openclaw-session-bridge.example.js",
+      "timeoutMs": 30000
+    }
+  },
+  "roles": {
+    "menfang": {
+      "provider": "stub"
+    },
+    "xianling": {
+      "provider": "stub"
+    },
+    "zhubu": {
+      "provider": "exec"
+    },
+    "kuaishou": {
+      "provider": "stub"
+    },
+    "dianshi": {
+      "provider": "stub"
+    },
+    "zhangfang": {
+      "provider": "stub"
+    }
+  }
+}
