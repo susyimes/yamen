@@ -186,6 +186,12 @@ Yamen 不是没有复核，而是：
 
 这里我建议把 Yamen 做成 **4+1 或 5+1 Agent 架构**。
 
+说明一下：
+- 这是制度设计上的完整表达
+- 当前 OpenClaw 接入实现里，最小主路径已经收敛为：`yamen-prefect + yamen-entry + zhubu / kuaishou / dianshi`
+- 其中 `yamen-entry` 是 **门房 + 县令的合并入口**
+- `账房 / 库吏` 目前仍保留在制度层，但还不在当前最小运行主路径里
+
 ### 基础版：4+1
 
 ```text
@@ -599,11 +605,18 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 - `AGENTS.md`
 - `SOUL.md`
 - `role.json`
+- `README.md`
 - `auth-profiles.json`
+- `memory/`
+- `logs/`
+
+说明：
+- `auth-profiles.json` 属于本地 runtime 材料，只用于角色环境可运行化
+- 这些复制出来的 auth 文件不应提交进 git
 
 ---
 
-### 第 1 步：确认三条最小入口
+### 第 1 步：确认最小可测试路径
 
 #### A. 先验证规则和 contract 没漂
 
@@ -614,7 +627,11 @@ node scripts/run-operator-failure-smoke.js
 
 这两条分别验证：
 - 3 条 happy path：`direct / filed / reviewed`
-- 4 类简单失败：timeout / invalid JSON / next_role 漂移 / entry closure fail
+- 4 类简单失败：timeout / invalid JSON / `next_role` 漂移 / `entry` closure fail
+
+也就是说，当前 repo 里的 `yamen-operator` 已经至少具备了：
+- 最小 happy path 验证
+- 最小失败 stop-and-report 验证
 
 #### B. 把一个 bridge request 导出成可执行的 OpenClaw session tool 参数
 
@@ -760,6 +777,7 @@ node runtime/prefect-flow.js report <case_id> <entry-report.json>
 
 **skills**
 - `skills/yamen-provision/SKILL.md`
+- `skills/yamen-provision/references/operator-playbook.md`
 - `skills/yamen-operator/SKILL.md`
 - `skills/yamen-operator/references/execution-flow.md`
 - `skills/yamen-operator/references/failure-handling.md`
