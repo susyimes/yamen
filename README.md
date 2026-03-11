@@ -1,700 +1,365 @@
 # 🏮 Yamen
 
-> 用中国古代 **县衙 / 州府** 的治理逻辑，设计一套 **更轻量、少 Agent、低沟通成本** 的 AI 协作架构。
+> A lightweight multi-agent institution inspired by the Chinese **yamen / prefecture office** model: fewer roles, shorter chains, clearer handoffs.
 
-如果说 **Edict / 三省六部** 适合中高复杂度、强审议、强治理的大任务，
-那么 **Yamen（衙门）** 想解决的就是另一类问题：
+Yamen is **not** trying to be a smaller Edict.
+It is a different shape of system:
 
-> **不是所有事都需要上朝。很多日常事务，更像是县衙办案、州府理事：链路更短、角色更少、决断更快。**
+- **Edict** is for heavier governance, stronger review, longer chains
+- **Yamen** is for lighter execution, medium-complexity tasks, and everyday operational work
 
-所以 Yamen 的目标不是做一个缩水版 Edict，而是做一套 **适合轻量任务、中等任务、日常事务处理** 的制度化多 Agent 架构。
+Current project direction:
 
----
+> **Yamen repo = rule layer**  
+> **OpenClaw = runtime layer**
 
-## 它想解决什么问题？
+This repository now focuses on:
+- role boundaries
+- case contracts
+- transition rules
+- runtime references
+- OpenClaw-oriented skills and runbooks
 
-多 Agent 系统很容易出现两个极端：
-
-### 极端 1：只有一个万能 Agent
-优点：
-- 快
-- 简单
-- 用户容易理解
-
-缺点：
-- 规划、执行、审查全混在一起
-- 容易遗漏风险
-- 任务一复杂就混乱
-- 很难审计和复盘
-
-### 极端 2：制度太完整，链路太长
-优点：
-- 分工清楚
-- 质量高
-- 风险可控
-
-缺点：
-- 简单任务也要层层流转
-- token 和等待成本高
-- 用户会觉得“你怎么还在开会”
-
-Yamen 想走的是中间路线：
-
-> **保留制度，减少层级；保留分工，减少官僚化。**
-
-它更适合：
-
-- 日常任务
-- 轻量工程任务
-- 中等复杂度需求
-- 查询、整理、写作、修补、执行类任务
-- 需要一点分工，但不值得启用完整朝廷体制的事情
+Not on a full standalone backend/frontend platform.
 
 ---
 
-## 为什么是“县衙 / 州府”？
+## What Yamen is for
 
-县衙和州府的特点，不是没有制度，而是：
+Yamen is meant for tasks that benefit from **some institutional structure**, but do **not** justify a heavy multi-department system.
 
-- **离事最近**
-- **链路更短**
-- **主官拍板更快**
-- **分工有，但不铺张**
-- **既能办日常事务，也能处理一定复杂度案件**
+Typical fit:
+- writing / polishing / summarization
+- small engineering changes
+- bug triage and execution
+- lightweight research and compilation
+- medium-scope operational tasks
+- tasks that sometimes need review, but not always
 
-如果把它映射成 AI Agent 体系，就是：
+Core idea:
 
-- 不搞十几个部门同时上阵
-- 不让每个请求都经过长链路审议
-- 保留必要的分工和复核
-- 强调 **“一人统办 + 分工协办 + 必要时复核”**
-
-这比三省六部更适合做“少 Agent 版”的主力工作流。
+> Keep the system structured enough to be auditable, but short enough to stay useful.
 
 ---
 
-## 🏮 县衙式架构总览
+## Mental model
 
+Instead of treating multi-agent work as free-form roleplay, Yamen treats it as **case-driven orchestration**.
+
+A request becomes a **case**.
+The case is then routed through a small set of roles with explicit handoffs and state transitions.
+
+### Current role model
+
+External / visible layer:
+- **`yamen-prefect`** — visible superior session, receives tasks from the user/open host surface
+
+Internal Yamen layer:
+- **`yamen-entry`** — merged **门房 + 县令** entry session
+- **`yamen-zhubu`** — 主簿, drafting / clarification / case note / structure
+- **`yamen-kuaishou`** — 快手, execution
+- **`yamen-dianshi`** — 典史, review / risk gate
+
+Optional / conceptual role:
+- **账房 / zhangfang** remains in the institutional design, but is not part of the current minimal runtime path
+
+---
+
+## Execution modes
+
+Yamen currently models three main case paths:
+
+### 1. `direct`
+For light, low-risk work.
+
+Path:
 ```text
-┌──────────────────────────────────────────────────────────────┐
-│                        👤 用户 / 苦主                         │
-│                提需求、报事务、追问进展、收结果              │
-└─────────────────────────────┬────────────────────────────────┘
-                              │
-                              ▼
-┌──────────────────────────────────────────────────────────────┐
-│                        🚪 门房 / 受理                         │
-│     接待来意、分辨闲聊/查询/立案、清洗输入、提炼标题          │
-└─────────────────────────────┬────────────────────────────────┘
-                              │
-                              ▼
-┌──────────────────────────────────────────────────────────────┐
-│                     🧑‍⚖️ 县令 / 主官决断                      │
-│      判断轻重缓急，决定直办 / 立案 / 复核案，统一拍板         │
-└──────────────┬───────────────────────┬───────────────────────┘
-               │                       │
-               ▼                       ▼
-┌────────────────────────────┐   ┌────────────────────────────┐
-│      📚 主簿 / 书办         │   │      🪶 典史 / 复核         │
-│  写任务单、补计划、整理文书 │   │  风险把关、规则复核、放行   │
-└──────────────┬─────────────┘   └──────────────┬─────────────┘
-               │                                │
-               ▼                                │
-┌──────────────────────────────────────────────────────────────┐
-│                    ⚒️ 快手 / 承办执行                        │
-│     查询、写作、修改、编码、调试、整理、实际完成任务          │
-└─────────────────────────────┬────────────────────────────────┘
-                              │
-                              ▼
-┌──────────────────────────────────────────────────────────────┐
-│                 🧮 账房 / 库吏（可选）                        │
-│          数据台账、资源清单、成本核算、统计汇总              │
-└─────────────────────────────┬────────────────────────────────┘
-                              │
-                              ▼
-┌──────────────────────────────────────────────────────────────┐
-│                     📜 回禀 / 结案回复                        │
-│           对用户输出：结果、进展、遗留项、风险说明           │
-└──────────────────────────────────────────────────────────────┘
+yamen-prefect -> yamen-entry -> kuaishou -> yamen-entry report -> yamen-prefect
 ```
 
-这套图想表达的不是“官职好看”，而是县衙式治理的三个特点：
+### 2. `filed`
+For tasks that need a formal case note or a bit of structure before execution.
 
-- **入口统一**：先由门房受理，不让原始请求直接冲进执行层
-- **主官拍板**：由县令决定是直办、立案还是复核案
-- **少人协同**：主簿辅助梳理、快手实际执行、典史按需复核
-
-一句话说：
-
-> **县衙不是没有制度，而是制度更短、更贴近办事本身。**
-
----
-
-## Yamen 的核心设计原则
-
-### 1. 少角色，但每个角色要清楚
-Yamen 不追求部门齐全，而追求：
-
-- 谁接案
-- 谁主办
-- 谁协办
-- 谁复核
-- 谁回话
-
-角色少，但职责必须稳。
-
----
-
-### 2. 默认短链路，不默认多轮流转
-大部分任务应该：
-
-- 快速受理
-- 快速判断
-- 快速执行
-- 快速回报
-
-而不是一上来就规划、审议、派发、再汇总。
-
----
-
-### 3. 复杂任务才升级制度
-Yamen 不是没有复核，而是：
-
-- 简单任务：直接办
-- 中等任务：主簿协助拆解
-- 风险任务：加司理/复核
-- 特殊任务：必要时再升级到更重制度
-
-这是一套“逐级加制度”的架构，而不是“默认最重”。
-
----
-
-### 4. 对用户要像“县太爷办事”，不是“朝廷开大会”
-用户最关心的不是内部官职，而是：
-
-- 你听懂没有
-- 你准备怎么办
-- 你什么时候给结果
-
-所以 Yamen 需要做到：
-
-> **内部有制度，外部像一个干练的衙门。**
-
----
-
-## 🏮 Yamen 的建议组织架构
-
-这里我建议把 Yamen 做成 **4+1 或 5+1 Agent 架构**。
-
-### 基础版：4+1
-
+Path:
 ```text
-用户
-  ↓
-门房 / 受理
-  ↓
-县令 / 主官
-  ↓
-主簿 / 书办
-  ↓
-快手 / 承办
-  ↓
-典史 / 复核（按需）
-  ↓
-回禀用户
+yamen-prefect -> yamen-entry -> zhubu -> kuaishou -> yamen-entry report -> yamen-prefect
 ```
 
-### 扩展版：5+1
+### 3. `reviewed`
+For higher-risk work that needs review before closure.
 
+Path:
 ```text
-用户
-  ↓
-门房（受理）
-  ↓
-县令（主官决断）
-  ├── 主簿（规划、记录、文书）
-  ├── 快手（执行）
-  └── 典史（风控、复核）
-  ↓
-账房 / 库吏（数据、资源、台账，可选）
-  ↓
-回禀用户
+yamen-prefect -> yamen-entry -> zhubu -> kuaishou -> dianshi -> yamen-entry report -> yamen-prefect
 ```
 
-这套结构的重点是：
+---
 
-- **门房**：负责接待和分流
-- **县令**：负责统一判断和拍板
-- **主簿**：负责文书、规划、记录、任务拆解
-- **快手**：负责动手执行
-- **典史**：负责风控、合法性、复核
-- **账房 / 库吏**：负责数据、清单、资源核算（可选）
+## Current architecture
 
-这比三省六部轻得多，但仍然有组织感。
+### 1. Rule layer in this repo
+
+This repo contains the institutional and orchestration rules:
+
+- `contracts/`
+  - case schema
+  - entry output schema
+  - operator status schema
+  - prefect report schema
+  - handoff contract
+  - transition table
+- `config/`
+  - provisioning config
+  - role/session mappings
+  - runtime map
+  - routing and escalation config
+- `agents/*/SOUL.md`
+  - role voice, intent, and boundaries
+- `cases/templates/`
+  - direct / filed / reviewed templates
+- `docs/`
+  - runtime notes, progression docs, integration plans, runbooks
+
+### 2. Runtime reference layer in this repo
+
+These files are **reference / rehearsal / bridge** code, not the final long-term architecture:
+
+- `runtime/`
+- `scripts/`
+
+They are useful for:
+- smoke tests
+- bridge rehearsals
+- payload exports
+- reference orchestration behavior
+
+### 3. Runtime layer in OpenClaw
+
+The target execution model lives in OpenClaw via skills and session tools:
+
+- `skills/yamen-provision/`
+  - provision or refresh Yamen role workspaces
+- `skills/yamen-operator/`
+  - run Yamen case logic inside OpenClaw
+
+That means the repo is no longer best understood as:
+- “a standalone app waiting for a backend”
+
+It is better understood as:
+- **an institutional package + runtime references for OpenClaw-native operation**
 
 ---
 
-## 各角色怎么分工？
+## Repo status now
 
-## 🚪 门房 —— 入口受理
-门房是系统入口，负责：
+The project has already moved beyond a pure concept skeleton.
 
-- 接收用户请求
-- 判断是闲聊、查询、待办还是正式任务
-- 清洗输入
-- 提炼标题
-- 决定是否直接回复，还是送县令判断
+### What is already in place
 
-它像“衙门门口的第一道口子”。
+#### Institutional structure
+- `AGENTS.md`
+- role `SOUL.md` files
+- handoff and permission documents
+- direct / filed / reviewed case templates
 
-门房应该处理的典型事情：
+#### Contracts and schemas
+- `contracts/case.schema.json`
+- `contracts/entry-output.schema.json`
+- `contracts/operator-status.schema.json`
+- `contracts/prefect-report.schema.json`
+- `contracts/transitions.json`
 
-- "今天天气怎么样？" → 直接答
-- "帮我润色这段文案" → 可以直转轻办
-- "帮我改个 bug" → 送县令判断是否立案
-- "帮我做一个登录系统" → 明显属于正式任务
+#### Runtime references
+- case store / orchestrator / transition engine references in `runtime/`
+- bridge relay and payload tooling
+- prefect flow reference tools
 
-门房的价值：
+#### Provisioning path
+- `scripts/bootstrap-yamen-runtime.ps1`
+- `docs/role-runtime-provisioning.md`
+- `skills/yamen-provision/`
 
-> **别让所有原始输入直接冲进主流程。**
-
----
-
-## 🧑‍⚖️ 县令 —— 主官 / 决策中枢
-县令是 Yamen 的核心。
-
-和三省六部相比，Yamen 没有把“规划、审议、派发”拆成三层，而是把大量判断集中到县令这里。
-
-县令负责：
-
-- 判断任务轻重缓急
-- 决定走直办、协办还是复核流
-- 指定主办人
-- 在需要时让主簿补规划
-- 在有风险时让典史复核
-- 最终决定怎么回禀用户
-
-这就是县衙体制和朝廷体制的差别：
-
-> **朝廷强调分权制衡；县衙强调主官统办。**
-
-县令不是执行者，而是“少 Agent 架构里的大脑”。
+#### Operator path
+- `skills/yamen-operator/`
+- `scripts/run-operator-smoke.js`
+- `scripts/run-operator-failure-smoke.js`
 
 ---
 
-## 📚 主簿 —— 任务书写员 / 规划员
-主簿是县令最重要的助手。
+## What has been validated
 
-它负责：
+The current repo already has a minimally testable operator path.
 
-- 把口头需求整理成清晰任务
-- 写出简要计划
-- 必要时拆成 2~5 个子项
-- 记录过程与结论
-- 整理交付文书
+### Happy-path smoke coverage
 
-它相当于把三省六部里的部分中书省、部分礼部能力合并起来。
+`scripts/run-operator-smoke.js` validates:
+- `direct`
+- `filed`
+- `reviewed`
 
-适合主簿处理的事情：
+### Failure smoke coverage
 
-- 写一页执行计划
-- 梳理需求边界
-- 整理接口说明
-- 生成任务单
-- 写总结和回报
+`scripts/run-operator-failure-smoke.js` validates representative failures:
+- role timeout
+- invalid JSON from role output
+- `next_role` drifting outside configured Yamen roles
+- entry closure/report generation failure
 
-主簿不是重型 Planner，而是：
+So the current maturity is roughly:
 
-> **在轻量制度下，把事情讲明白的人。**
-
----
-
-## ⚒️ 快手 —— 承办执行员
-快手是实际干活的人。
-
-它负责：
-
-- 查询
-- 撰写
-- 修改
-- 编码
-- 调试
-- 汇总素材
-- 跑流程
-
-在很多任务里，快手就是最常用的执行 Agent。
-
-它相当于把三省六部里的：
-
-- 兵部（工程）
-- 礼部（文稿）
-- 工部（工具）
-- 户部的一部分（简单数据）
-
-做了一个轻量合并。
-
-Yamen 的思路不是极致专业分工，而是：
-
-> **让一个承办角色覆盖多数日常任务，再在必要时调用额外角色协助。**
+- **Yamen Provision**: minimally testable provisioning skill + operator-facing playbook
+- **Yamen Operator**: minimally testable execution skill + happy/failure smoke references
 
 ---
 
-## 🪶 典史 —— 风控 / 复核 / 规矩官
-典史不是时时都要出场。
+## Core design principles
 
-它只在这些场景出现：
+### 1. One external mouthpiece
+Externally, Yamen should not sound like five agents arguing.
 
-- 涉及外部发布
-- 涉及生产环境
-- 涉及账号、权限、密钥
-- 涉及较大改动
-- 涉及用户可能会追责的输出
-- 快手执行结果存在疑点
+- `yamen-entry` is the internal mouthpiece of the Yamen system
+- `yamen-prefect` is the visible superior-facing layer
 
-典史负责：
+### 2. Short chains by default
+Not every task deserves planning, review, and committee behavior.
 
-- 复核是否越权
-- 复核是否高风险
-- 看结果是否达标
-- 判断是否允许回禀
+Default preference:
+- shortest valid route
+- escalate only when needed
 
-它相当于一个轻量版门下省 + 刑部。
+### 3. Strict role boundaries
+Roles should not collapse into each other just because the runtime can technically do so.
 
-这也是 Yamen 和单 Agent 最大的差别之一：
+- entry classifies and routes
+- zhubu structures
+- kuaishou executes
+- dianshi reviews
 
-> **默认不审，但关键时刻有人管。**
+### 4. Stop-and-report on failure
+If the runtime drifts, it should stop honestly and report.
 
----
+Do not:
+- silently bypass invalid outputs
+- silently invent next roles
+- silently close a broken case
 
-## 🧮 账房 / 库吏 —— 数据与台账（可选）
-这是一个可选角色。
+### 5. Cases over free-form chatter
+The primary object is the **case**, not the chat transcript.
 
-在很多任务里未必需要；但如果做成 5+1 架构，它会很有用。
-
-它负责：
-
-- 数据整理
-- 清单记录
-- 成本核算
-- 台账维护
-- 资源清点
-
-比如：
-
-- 统计某项目现状
-- 汇总接口清单
-- 生成日报/周报数据
-- 做简单财务/成本分析
-
-它相当于一个轻量版户部。
+The system should always be able to answer:
+- what case is active
+- which role handled it
+- what transition happened
+- why it stopped or completed
 
 ---
 
-## 一条任务在 Yamen 里怎么走？
+## Recommended reading order
 
-### 例子 1：轻任务 —— 润色一段公告
-用户说：
+If you want to understand the project quickly, read in this order.
 
-> 帮我把这段团队公告改得更清楚一点。
+### A. First: understand the contracts
+- `contracts/case.schema.json`
+- `contracts/transitions.json`
+- `contracts/handoff.md`
+- `contracts/entry-output.schema.json`
+- `contracts/operator-status.schema.json`
+- `contracts/prefect-report.schema.json`
 
-流程：
+### B. Then: understand the runtime model
+- `docs/runtime-architecture.md`
+- `docs/role-runtime-provisioning.md`
+- `docs/prefect-flow.md`
+- `docs/operator-runtime-progression.md`
+- `docs/openclaw-integration-plan.md`
 
-```text
-门房受理 → 县令判断为轻办 → 快手直接处理 → 主簿整理回话 → 回复用户
-```
-
-特点：
-
-- 不需要立复杂任务树
-- 不需要复核
-- 不需要多人并行
-- 目标是快
-
----
-
-### 例子 2：中任务 —— 修一个小 bug
-用户说：
-
-> 登录页按钮点击后偶尔没反应，帮我排查一下。
-
-流程：
-
-```text
-门房受理 → 县令立案 → 主簿写简单任务单 → 快手排查与修改 → 必要时典史复核 → 回禀用户
-```
-
-特点：
-
-- 有主线
-- 有执行
-- 有必要时复核
-- 但不需要动用完整朝廷体制
+### C. Then: understand the OpenClaw skills
+- `skills/yamen-provision/SKILL.md`
+- `skills/yamen-provision/references/operator-playbook.md`
+- `skills/yamen-operator/SKILL.md`
+- `skills/yamen-operator/references/execution-flow.md`
+- `skills/yamen-operator/references/failure-handling.md`
+- `skills/yamen-operator/references/summary-report-contract.md`
 
 ---
 
-### 例子 3：较复杂任务 —— 做一个小功能
-用户说：
+## Getting started
 
-> 帮我给这个项目加一个反馈入口，前端表单 + 后端接口 + 简单说明文档。
+## 1) Provision local Yamen role workspaces
 
-流程：
-
-```text
-门房受理
-→ 县令判断为中复杂任务
-→ 主簿拆成前端 / 后端 / 文档三个子项
-→ 快手执行主任务
-→ 账房整理字段/清单（可选）
-→ 典史做风险复核（如涉及数据采集）
-→ 县令统一回禀
-```
-
-这时它已经有一点“州府办案”的味道了：
-
-- 不是只有一个人乱干
-- 也不是十几个部门一起开会
-- 而是主官主导、书办组织、快手执行、典史把关
-
----
-
-## Yamen 和 Edict 的差别
-
-### 一句话对比
-
-- **Edict / 三省六部**：像中央朝廷，适合大事、难事、风险高的事
-- **Yamen / 县衙州府**：像地方衙门，适合日常事务、中小任务、讲究效率的事
-
----
-
-## 差别对比表
-
-| 维度 | Edict（三省六部） | Yamen（县衙 / 州府） |
-|---|---|---|
-| **适用任务** | 中高复杂度、跨部门、强审议 | 轻量任务、中小任务、日常事务 |
-| **组织风格** | 分层治理、制度完备 | 主官统办、短链决断 |
-| **默认链路** | 较长 | 较短 |
-| **角色数量** | 多 | 少 |
-| **审核机制** | 强审核、强制衡 | 按需复核、风险触发 |
-| **执行模式** | 多部门并行 | 少量角色协同 |
-| **沟通成本** | 较高 | 较低 |
-| **适合体验** | 像“AI 上朝” | 像“有人替你办事” |
-| **优势** | 规范、可审计、适合复杂治理 | 快、轻、顺手、理解成本低 |
-| **风险** | 容易过重、官僚化 | 容易过度依赖主官判断 |
-
----
-
-## Yamen 的制度优势
-
-### 1. 更适合日常高频任务
-很多真实工作，并没有复杂到需要完整审议链路。
-
-Yamen 更适合：
-
-- 写文案
-- 查资料
-- 做小改动
-- 补文档
-- 跑简单排查
-- 做轻量信息整理
-
----
-
-### 2. 用户更容易理解
-普通用户不一定关心“中书省和门下省谁先谁后”。
-
-但他很容易理解：
-
-- 门房先接待
-- 县令判断怎么办
-- 主簿整理任务
-- 快手去办
-- 典史必要时复核
-
-这套隐喻很自然。
-
----
-
-### 3. 链路更短，适合速度优先
-Yamen 天生适合：
-
-- 先出结果
-- 再决定是否需要补复核
-- 在保证基本规矩的前提下提高响应速度
-
----
-
-## Yamen 的潜在问题
-
-### 1. 县令可能变成瓶颈
-因为主官集中决策，所以县令很容易成为：
-
-- 判断瓶颈
-- 协调瓶颈
-- 上下文瓶颈
-
-所以 Yamen 必须控制范围，不要让所有复杂任务都压给县令。
-
----
-
-### 2. 容易“看起来轻”，实际职责混杂
-如果边界不写清楚，就会出现：
-
-- 县令既在判断，也在规划，也在派发
-- 主簿既写文书，也在替快手执行
-- 快手既改东西，也自己复核自己
-
-所以即使是轻量架构，也要写清楚角色边界。
-
----
-
-### 3. 需要明确什么时候升级制度
-Yamen 不适合所有任务。
-
-如果用户要做的是：
-
-- 跨团队复杂项目
-- 高风险部署
-- 强审计要求
-- 多轮并行大任务
-
-那就应该升级到更重制度，而不是硬塞进县衙模式。
-
----
-
-## OpenClaw Get Started（工程接入）
-
-这一节只讲：**怎么把 Yamen 作为规则层接进 OpenClaw，并在 OpenClaw 内部运行成一种工作模式。**
-
-### 当前定位
-
-- **Yamen repo** = 规则层
-- **OpenClaw** = 运行层
-- **`skills/yamen-provision`** = 角色运行环境 provisioning
-- **`skills/yamen-operator`** = 内部执行 skill，负责 `yamen-prefect -> entry -> internal roles -> entry report`
-
-也就是说：
-- repo 负责 contract / transitions / references
-- OpenClaw 负责 session / relay / execution / stop-and-report
-- `yamen-operator` 负责把规则真的驱动起来
-
----
-
-### 第 0 步：先 provision 一套角色运行环境
-
-在仓库根目录运行：
+Run:
 
 ```powershell
 pwsh -File scripts/bootstrap-yamen-runtime.ps1
 ```
 
-它会在 `.openclaw/yamen-runtime/` 下生成：
+This creates or refreshes local runtime workspaces under:
 
-- `workspace-prefect`
-- `workspace-entry`
-- `workspace-zhubu`
-- `workspace-kuaishou`
-- `workspace-dianshi`
+```text
+.openclaw/yamen-runtime/
+├─ workspace-prefect/
+├─ workspace-entry/
+├─ workspace-zhubu/
+├─ workspace-kuaishou/
+└─ workspace-dianshi/
+```
 
-每个 workspace 至少会包含：
+Expected workspace contents include:
 - `AGENTS.md`
 - `SOUL.md`
 - `role.json`
-- `auth-profiles.json`
+- `README.md`
+- local-only `auth-profiles.json`
+- `memory/`
+- `logs/`
+
+Important:
+- copied auth is **local runtime material only**
+- do **not** commit copied auth files
 
 ---
 
-### 第 1 步：确认三条最小入口
+## 2) Validate the operator reference flow
 
-#### A. 先验证规则和 contract 没漂
+Run the smoke tests:
 
 ```bash
 node scripts/run-operator-smoke.js
 node scripts/run-operator-failure-smoke.js
 ```
 
-这两条分别验证：
-- 3 条 happy path：`direct / filed / reviewed`
-- 4 类简单失败：timeout / invalid JSON / next_role 漂移 / entry closure fail
+What these give you:
+- proof that the minimal route logic still matches the current contracts
+- proof that representative failure modes still stop and report honestly
 
-#### B. 把一个 bridge request 导出成可执行的 OpenClaw session tool 参数
+---
+
+## 3) Rehearse bridge / payload flow when needed
+
+To export an OpenClaw session-tool payload draft from a request:
 
 ```bash
 node scripts/export-openclaw-session-payload.js <request-file>
 ```
 
-它会输出：
-- `suggested_tool`：`sessions_spawn` 或 `sessions_send`
-- `directly_executable_args`：可直接照着执行的参数草案
-
-#### C. 走一遍 filed 半自动演练
-
-推荐先用 ASCII sample，避免 PowerShell 中文 case_id 编码问题：
+To walk a filed bridge rehearsal:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 -RequestFile runtime/sample-request.filed.ascii.json
 ```
 
-常用参数：
+Useful flags:
 
 ```powershell
-# 自动写 scaffold response，适合干跑
 powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 -RequestFile runtime/sample-request.filed.ascii.json -AutoScaffold
-
-# 最后自动附加 entry report
 powershell -ExecutionPolicy Bypass -File scripts/run-filed-bridge-rehearsal.ps1 -RequestFile runtime/sample-request.filed.ascii.json -AutoScaffold -AutoReport
 ```
 
 ---
 
-### 第 2 步：理解正式接入模型
+## 4) Understand the intended live OpenClaw flow
 
-推荐运行方式：
-
-```text
-main session = external caller / OpenClaw host surface
-visible superior session = yamen-prefect
-entry session = menfang + xianling (merged as yamen-entry)
-internal role sessions = zhubu / kuaishou / dianshi
-```
-
-也就是说：
-- 主会话不直接扮演 Yamen
-- 用户先进入 OpenClaw 标准可见层上的 `yamen-prefect`
-- `yamen-prefect` 再向独立的 `yamen-entry` 提交案件
-- `yamen-entry` 决定 `direct / filed / reviewed`
-- 再按需调 `zhubu / kuaishou / dianshi`
-
----
-
-### 第 3 步：最小 bridge 操作流
-
-先按下面这条标准顺序跑：
-
-```bash
-node runtime/openclaw-bridge-relay.js list
-node runtime/openclaw-bridge-relay.js show <request-file>
-node scripts/export-openclaw-session-payload.js <request-file>
-# 在 OpenClaw 中执行上一步导出的 sessions_spawn / sessions_send 参数
-node runtime/openclaw-bridge-relay.js write-response-stdin <request-file>
-```
-
-如果想压缩步骤，用：
-
-```bash
-node scripts/relay-semi-auto.js <request-file>
-```
-
-或：
-
-```bash
-node scripts/relay-semi-auto.js <request-file> --stdin
-```
-
----
-
-### 第 4 步：阶段 2 的主路径
-
-现在 repo 里的主路径是：
+Target live flow:
 
 ```text
 external caller
@@ -706,68 +371,64 @@ external caller
 -> external caller
 ```
 
-可直接用：
+Where:
+- OpenClaw session tools create or reuse role sessions
+- Yamen contracts decide valid structure and transitions
+- the operator layer validates outputs and routes the next step
 
-```bash
-node runtime/prefect-flow.js submit runtime/sample-request.filed.json
-node runtime/prefect-flow.js show <case_id>
-node runtime/prefect-flow.js report <case_id> <entry-report.json>
+---
+
+## What this repo is not doing yet
+
+This repo is **not yet** a full independent production platform with:
+- standalone service API
+- database-backed persistent case service
+- frontend dashboard
+- long-running autonomous multi-worker deployment
+
+Those may come later.
+
+Right now the project is optimized for:
+- rule clarity
+- OpenClaw integration
+- reproducible reference flows
+- minimally testable skills
+
+---
+
+## Near-term direction
+
+The most natural next steps are:
+
+1. keep tightening README/docs so they match the actual implementation
+2. move more of the runtime behavior from reference scripts into OpenClaw-native execution
+3. add more structured operator/provision contracts where useful
+4. connect provision + operator into a cleaner end-to-end runbook
+
+---
+
+## Repository map
+
+```text
+yamen/
+├─ agents/          # role identity / SOUL files
+├─ cases/           # templates + local case storage references
+├─ config/          # provisioning / sessions / routing / runtime maps
+├─ contracts/       # schemas and handoff / state contracts
+├─ docs/            # architecture and runbooks
+├─ runtime/         # reference runtime / bridge / orchestrator code
+├─ scripts/         # smoke tests, bootstrap, rehearsal helpers
+└─ skills/          # OpenClaw-oriented provision/operator skills
 ```
 
 ---
 
-### 第 5 步：OpenClaw 里真正需要的能力
+## One-sentence summary
 
-工程接入阶段，先只依赖这些能力：
-
-- `read`：读取规则文件与 contract
-- `sessions_spawn`：按需创建角色会话
-- `sessions_send`：向已有角色会话发 handoff
-- `write/edit`：生成任务单、报告、桥接 response
-- `exec/browser`：让快手承办执行具体动作
-
----
-
-### 最小接入完成标准
-
-满足下面几条，就说明 Yamen 已经以“规则层 + 运行层”方式接进 OpenClaw：
-
-- 用户能通过 OpenClaw 标准界面进入 `yamen-prefect`
-- `yamen-prefect` 能以知府/上级身份提交案件
-- `yamen-entry` 能输出合法 intake / report 结构
-- `zhubu / kuaishou / dianshi` 能通过 OpenClaw session 或 bridge 被调用
-- 角色交接遵循 `contracts/handoff.md`
-- 失败时能 stop-and-report，而不是静默漂移
-
----
-
-### 推荐先读这些文件
-
-**规则层 / 核心 contract**
-- `contracts/case.schema.json`
-- `contracts/entry-output.schema.json`
-- `contracts/operator-status.schema.json`
-- `contracts/prefect-report.schema.json`
-- `contracts/transitions.json`
-- `contracts/handoff.md`
-
-**运行层 / 接入路径**
-- `docs/openclaw-integration-plan.md`
-- `docs/prefect-flow.md`
-- `docs/openclaw-bridge-runbook.md`
-- `docs/openclaw-session-payload-exporter.md`
-- `docs/operator-runtime-progression.md`
-
-**skills**
-- `skills/yamen-provision/SKILL.md`
-- `skills/yamen-operator/SKILL.md`
-- `skills/yamen-operator/references/execution-flow.md`
-- `skills/yamen-operator/references/failure-handling.md`
-- `skills/yamen-operator/references/session-payloads.md`
-- `skills/yamen-operator/references/bridge-driver.md`
+**Yamen is now best described as a lightweight institutional package for OpenClaw-native multi-agent execution, not just a metaphorical org chart and not yet a full standalone platform.**
 
 ---
 
 ## License
 
-沿用仓库中的 License 约定。
+Follow the repository's existing license arrangement.
