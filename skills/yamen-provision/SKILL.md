@@ -34,6 +34,7 @@ Before provisioning, read:
 - `references/provisioning-summary-contract.md`
 - `references/minimal-test.md`
 - `references/host-actions.md`
+- `references/operator-playbook.md`
 
 Then:
 1. validate prerequisites

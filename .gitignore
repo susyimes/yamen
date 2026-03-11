@@ -8,3 +8,6 @@
 
 # Local learnings
 .learnings/
+
+# Local operator smoke outputs
+cases/active/*.json
