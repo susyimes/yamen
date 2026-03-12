@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { buildSessionRoutingAdvice } = require('../runtime/openclaw-bridge-relay');
+const { buildEnsureEntryAvailable } = require('../runtime/entry-availability');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const REQUEST_DIR = path.join(REPO_ROOT, 'runtime', 'bridge', 'openclaw-session', 'requests');
@@ -27,6 +28,11 @@ function buildToolDraft(request) {
   const tool = operatorPayload.tool;
   const payload = operatorPayload.payload || {};
 
+  const prerequisites = [];
+  if (request.role === 'entry') {
+    prerequisites.push(buildEnsureEntryAvailable(REPO_ROOT));
+  }
+
   return {
     request_file: request.bridge?.request_file || null,
     case_id: request.payload?.case_id || null,
@@ -34,6 +40,21 @@ function buildToolDraft(request) {
     action: request.transition?.action || null,
     suggested_tool: tool,
     directly_executable_args: payload,
+    prerequisites,
+    execution_plan: [
+      ...prerequisites.map((item) => ({
+        step: 'ensure-role-available',
+        role: item.role,
+        tool: item.tool,
+        directly_executable_args: item.directly_executable_args,
+      })),
+      {
+        step: 'dispatch-request',
+        role: request.role,
+        tool,
+        directly_executable_args: payload,
+      },
+    ],
     notes: {
       label: routing.label || null,
       session_mode: routing.sessionMode || null,

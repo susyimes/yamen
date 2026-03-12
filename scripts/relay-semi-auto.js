@@ -32,15 +32,25 @@ function usage() {
 }
 
 function printToolDraft(draft) {
-  console.log('\n=== Suggested OpenClaw Tool Call ===');
-  console.log(`tool: ${draft.suggested_tool}`);
-  console.log('args:');
-  console.log(JSON.stringify(draft.directly_executable_args, null, 2));
+  if (Array.isArray(draft.execution_plan) && draft.execution_plan.length > 0) {
+    console.log('\n=== Runtime Dispatch Plan ===');
+    draft.execution_plan.forEach((step, index) => {
+      console.log(`\n[${index + 1}] ${step.step}`);
+      console.log(`tool: ${step.tool}`);
+      console.log('args:');
+      console.log(JSON.stringify(step.directly_executable_args, null, 2));
+    });
+  } else {
+    console.log('\n=== Suggested OpenClaw Tool Call ===');
+    console.log(`tool: ${draft.suggested_tool}`);
+    console.log('args:');
+    console.log(JSON.stringify(draft.directly_executable_args, null, 2));
+  }
 
   console.log('\n=== Notes ===');
   console.log(JSON.stringify(draft.notes || {}, null, 2));
 
-  console.log('\nNext: execute the tool call above in OpenClaw, then copy the returned role JSON.');
+  console.log('\nNext: execute the plan above in OpenClaw, then copy the returned role JSON.');
 }
 
 function writeFromStdin(requestFile) {

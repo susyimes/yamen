@@ -18,6 +18,8 @@ node scripts/export-openclaw-session-payload.js <request-file>
 The script returns JSON with:
 - `suggested_tool`: `sessions_spawn` or `sessions_send`
 - `directly_executable_args`: the argument object to use with that tool
+- `prerequisites`: required pre-dispatch bootstrap steps (for example `ensure_entry_available`)
+- `execution_plan`: ordered OpenClaw tool calls to run
 - `notes`: label / session mode / spawn mode / workspace
 
 ## Purpose
@@ -35,8 +37,8 @@ It only converts a bridge request into a ready-to-use session tool payload draft
 
 1. produce or inspect a request file
 2. run exporter
-3. copy the emitted `directly_executable_args`
-4. execute the matching OpenClaw tool
+3. if `prerequisites` / `execution_plan` are present, execute them in order
+4. execute the final dispatch OpenClaw tool call
 5. write the returned role JSON back through the relay helper
 
 ### Quick demo
