@@ -23,6 +23,7 @@ node runtime/prefect-flow.js report <case_id> <entry-report.json>
 ## 当前作用
 
 - `submit`：从 `yamen-prefect` 口径创建案件，并把 prefect / entry / internal role workspace 挂进 case runtime 信息
+- `submit` 同时会产出 `ensure_entry_available` 草案，要求在 prefect 正式 dispatch 前先保证 `yamen-entry` 已可接手
 - `report`：把 `yamen-entry` 的统一回禀正式落回 case，形成 `yamen-prefect` 可读收口
 
 ## 现在的定位

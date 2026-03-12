@@ -4,6 +4,7 @@ const path = require("path");
 const { loadCase } = require("./case-store");
 const { getRoleSessionConfig } = require("./role-session-config");
 const { getProvisionedWorkspace } = require("./provisioning-config");
+const { buildEnsureEntryAvailable } = require("./entry-availability");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const BRIDGE_ROOT = path.join(REPO_ROOT, "runtime", "bridge", "openclaw-session");
@@ -95,6 +96,7 @@ function buildSessionRoutingAdvice(request) {
     spawnMode,
     purpose: roleSession.purpose || null,
     workspace,
+    ensure_entry_available: request.role === 'entry' ? buildEnsureEntryAvailable(REPO_ROOT) : null,
     suggested_openclaw_action: mode === "send" ? "sessions_send" : "sessions_spawn",
     suggested_steps: mode === "send"
       ? [
@@ -201,6 +203,16 @@ function buildNextHints() {
   const pending = listPending().filter((item) => !item.has_response);
   if (pending.length > 0) {
     const first = pending[0];
+    const nextSteps = [];
+    if (first.role === 'entry' && first.routing?.ensure_entry_available) {
+      nextSteps.push('Ensure yamen-entry is available before dispatch:');
+      nextSteps.push(JSON.stringify(first.routing.ensure_entry_available, null, 2));
+    }
+    nextSteps.push(
+      `node runtime/openclaw-bridge-relay.js show ${first.request_file}`,
+      `node runtime/openclaw-bridge-relay.js scaffold-json ${first.request_file}`,
+      `node runtime/openclaw-bridge-relay.js write-response-stdin ${first.request_file}`
+    );
     return {
       kind: "pending-request",
       request_file: first.request_file,
@@ -208,11 +220,7 @@ function buildNextHints() {
       role: first.role,
       action: first.action,
       routing: first.routing,
-      next_steps: [
-        `node runtime/openclaw-bridge-relay.js show ${first.request_file}`,
-        `node runtime/openclaw-bridge-relay.js scaffold-json ${first.request_file}`,
-        `node runtime/openclaw-bridge-relay.js write-response-stdin ${first.request_file}`
-      ]
+      next_steps: nextSteps
     };
   }
 

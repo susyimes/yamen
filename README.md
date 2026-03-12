@@ -762,6 +762,12 @@ node runtime/prefect-flow.js show <case_id>
 node runtime/prefect-flow.js report <case_id> <entry-report.json>
 ```
 
+其中 `submit` 现在会显式返回：
+- `ensure_entry_available`
+- `suggested_next_action = ensure_entry_available_then_yamen_prefect_handoff_to_entry`
+
+也就是说，runtime 不再只是假定 `entry` 存在，而是把“**先确保 entry 可接手，再由 prefect 发起 dispatch**”写成正式运行提示。
+
 ---
 
 ### 第 5 步：OpenClaw 里真正需要的能力

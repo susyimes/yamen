@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { createCase, loadCaseForRuntime, updateCaseForRuntime } = require("./orchestrator");
 const { getProvisionedWorkspace } = require("./provisioning-config");
+const { buildEnsureEntryAvailable } = require("./entry-availability");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 
@@ -38,6 +39,7 @@ function submitToEntry(request) {
     entry: {
       label: "yamen-entry",
       workspace: getProvisionedWorkspace(REPO_ROOT, "entry"),
+      ensure_available: buildEnsureEntryAvailable(REPO_ROOT),
     },
     internal_roles: {
       zhubu: getProvisionedWorkspace(REPO_ROOT, "zhubu"),
@@ -55,7 +57,8 @@ function submitToEntry(request) {
     next_session: "yamen-entry",
     prefect_workspace: currentCase.runtime.prefect.workspace,
     entry_workspace: currentCase.runtime.entry.workspace,
-    suggested_next_action: "yamen_prefect_handoff_to_entry",
+    ensure_entry_available: currentCase.runtime.entry.ensure_available,
+    suggested_next_action: "ensure_entry_available_then_yamen_prefect_handoff_to_entry",
     case: currentCase,
   };
 }
