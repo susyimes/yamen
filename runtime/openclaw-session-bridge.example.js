@@ -15,6 +15,46 @@ const fs = require("fs");
 function main() {
   const input = fs.readFileSync(0, "utf8");
   const payload = JSON.parse(input || "{}");
+  const step = payload.step || null;
+
+  if (step && step.step === 'ensure-role-available') {
+    const result = {
+      ok: true,
+      ensured: step.role,
+      meta: {
+        bridge: 'openclaw-session-example',
+        mode: 'ensure-role-available',
+        tool: step.tool,
+        label: step.directly_executable_args?.label || null,
+      },
+    };
+    process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+    return;
+  }
+
+  if (step && step.step === 'dispatch-request') {
+    const role = payload.bundle?.role || step.role || 'unknown';
+    const action = payload.bundle?.action || 'unknown_action';
+    const result = {
+      role,
+      action,
+      note: `[example-bridge] ${role} accepted ${action}`,
+      completed: ["bridge_invoked", "dispatch_request_executed"],
+      pending: ["replace_with_real_openclaw_session_call"],
+      blockers: [],
+      artifacts: [],
+      reply_summary: "",
+      occurred_at: new Date().toISOString(),
+      meta: {
+        bridge: "openclaw-session-example",
+        case_id: payload.bundle?.case_id || null,
+        mode: 'dispatch-request',
+        tool: step.tool,
+      },
+    };
+    process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+    return;
+  }
 
   const result = {
     role: payload.acting_role,

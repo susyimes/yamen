@@ -146,3 +146,37 @@ bundle 会包含：
 - 最后写回 response
 
 而是直接消费 bundle 即可。
+
+## Host-side adapter prototype
+
+当前 repo 里已经有一个最小原型：
+
+```bash
+node runtime/openclaw-host-adapter.js <request-file> --stdout
+```
+
+它会：
+1. 读取 request 对应的 adapter bundle
+2. 顺序执行 `execution_plan`
+3. 将最终 role JSON 自动写回 response 目录
+
+默认 executor 仍然是：
+
+```bash
+node runtime/openclaw-session-bridge.example.js
+```
+
+所以这还不是直接调用 OpenClaw 内部 sessions 工具的最终版；
+但 adapter 的输入、顺序、写回责任已经固定下来了。
+
+## Smoke test
+
+可直接运行：
+
+```bash
+node scripts/run-host-adapter-smoke.js
+```
+
+当前覆盖两条最小路径：
+- 普通角色 request：直接 dispatch
+- `entry` request：先 ensure，再 dispatch

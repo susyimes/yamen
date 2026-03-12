@@ -751,6 +751,20 @@ node scripts/export-openclaw-adapter-bundle.js <request-file>
 
 一次性打包出来，方便宿主侧顺序消费。
 
+当前 repo 里还补了一版最小 host-side adapter 原型：
+
+```bash
+node runtime/openclaw-host-adapter.js <request-file> --stdout
+```
+
+它会：
+1. 读取 adapter bundle
+2. 按顺序执行 `execution_plan`
+3. 自动把结果写回 `runtime/bridge/openclaw-session/responses/`
+
+> 现在这版默认仍接 `runtime/openclaw-session-bridge.example.js` 作为示例 executor，
+> 但宿主侧已经有了一个明确可接的 adapter contract。
+
 ---
 
 ### 第 4 步：阶段 2 的主路径

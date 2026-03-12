@@ -1,0 +1,53 @@
+{
+  "protocol": "yamen.openclaw-session.v1",
+  "delivery": "openclaw-bridge",
+  "role": "entry",
+  "session": {
+    "mode": "spawn",
+    "label": "yamen-entry",
+    "runtime": "subagent",
+    "agentId": "main",
+    "timeoutMs": 60000,
+    "spawnMode": "reuse-or-spawn"
+  },
+  "transition": {
+    "from": "received",
+    "action": "classify_request",
+    "to": "triaged",
+    "next_role": "xianling"
+  },
+  "payload": {
+    "case_id": "20260312-entry-sample",
+    "title": "sample entry intake",
+    "mode": "filed",
+    "current_status": "received",
+    "target_status": "triaged",
+    "action_requested": "classify_request",
+    "acting_role": "entry",
+    "next_role": "xianling",
+    "risk_level": "medium",
+    "priority": "normal",
+    "summary": "Receive a new filed case and produce intake triage.",
+    "raw_request": "Please intake and route this case.",
+    "completed": [],
+    "blockers": [],
+    "artifacts": [],
+    "reply_summary": ""
+  },
+  "prompt": "You now act as yamen-entry. Only handle the current action and return JSON.",
+  "bridge": {
+    "basename": "sample-entry-classify",
+    "request_file": "sample-entry-classify.request.json",
+    "response_file": "sample-entry-classify.response.json",
+    "case_id": "20260312-entry-sample"
+  },
+  "role_session": {
+    "managedBy": "openclaw-session",
+    "enabled": true,
+    "sessionLabel": "yamen-entry",
+    "runtime": "subagent",
+    "agentId": "main",
+    "sessionMode": "spawn",
+    "spawnMode": "reuse-or-spawn"
+  }
+}
