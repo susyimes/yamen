@@ -620,6 +620,29 @@ pwsh -File scripts/bootstrap-yamen-runtime.ps1
 - `auth-profiles.json` 属于本地 runtime 材料，只用于角色环境可运行化
 - 这些复制出来的 auth 文件不应提交进 git
 
+bootstrap 完成后，还会额外生成一份 **get started 启动清单**：
+
+- `.openclaw/yamen-runtime/bootstrap/openclaw-get-started.json`
+
+这份清单的核心目的不是重复 provision，而是让 **operator 在部署时先保证 `yamen-entry` 可用，再暴露 `yamen-prefect`**。
+
+如果你想直接导出一份当前环境可执行的 OpenClaw 启动草案，也可以运行：
+
+```bash
+node scripts/export-openclaw-get-started.js
+```
+
+默认启动顺序是：
+
+```text
+yamen-entry
+-> yamen-prefect
+```
+
+也就是说，当前 get started 的制度偏好已经明确成：
+
+> **方案 B：由上层 operator 保证 entry 先可用，prefect 只负责发起 dispatch。**
+
 ---
 
 ### 第 1 步：确认最小可测试路径
@@ -683,7 +706,8 @@ internal role sessions = zhubu / kuaishou / dianshi
 
 也就是说：
 - 主会话不直接扮演 Yamen
-- 用户先进入 OpenClaw 标准可见层上的 `yamen-prefect`
+- operator / get-started 层应先确保 `yamen-entry` 已可接手
+- 用户再进入 OpenClaw 标准可见层上的 `yamen-prefect`
 - `yamen-prefect` 再向独立的 `yamen-entry` 提交案件
 - `yamen-entry` 决定 `direct / filed / reviewed`
 - 再按需调 `zhubu / kuaishou / dianshi`

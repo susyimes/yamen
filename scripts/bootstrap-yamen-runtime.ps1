@@ -90,8 +90,47 @@ Do not assume the identity of raw main session.
 "@
 }
 
+function New-RoleBootstrapStep([string]$RoleId, [string]$RoleLabel, [string]$RoleRuntime, [string]$RoleAgentId, [string]$RoleSessionMode, [string]$WorkspacePath) {
+  $usePersistent = ($RoleSessionMode -eq 'session')
+  if ($RoleId -eq 'entry') {
+    $purpose = 'ensure_entry_available_before_prefect_dispatch'
+    $task = 'Start as yamen-entry (merged menfang+xianling). Accept handoff from yamen-prefect, handle triage/select_mode/merge_results, introduce yourself briefly, then wait for further instructions.'
+  }
+  else {
+    $purpose = 'visible_superior_agent_startup'
+    $task = 'Start as yamen-prefect (visible superior agent). In formal Yamen flow, non-trivial tasks must be dispatched to yamen-entry first; do not impersonate internal execution roles. Introduce yourself briefly, then wait for further instructions.'
+  }
+
+  if ($usePersistent) {
+    $mode = 'session'
+  }
+  else {
+    $mode = 'run'
+  }
+
+  return [ordered]@{
+    role = $RoleId
+    label = $RoleLabel
+    tool = 'sessions_spawn'
+    purpose = $purpose
+    directly_executable_args = [ordered]@{
+      runtime = $RoleRuntime
+      agentId = $RoleAgentId
+      label = $RoleLabel
+      mode = $mode
+      thread = $usePersistent
+      cleanup = 'keep'
+      sandbox = 'inherit'
+      cwd = $WorkspacePath
+      task = $task
+      timeoutSeconds = 60
+    }
+  }
+}
+
 $sourceAuth = Resolve-AuthSource $RepoRoot $config.auth.source
 $summary = @()
+$bootstrapSteps = @()
 
 foreach ($role in $roles) {
   $workspaceName = $config.roles.$role.workspace
@@ -160,10 +199,32 @@ foreach ($role in $roles) {
     label = $roleLabel
     authCopied = [bool]$sourceAuth
   }
+
+  if ($role -eq 'entry' -or $role -eq 'prefect') {
+    $bootstrapSteps += (New-RoleBootstrapStep $role $roleLabel $roleRuntime $roleAgentId $roleSessionMode $workspacePath)
+  }
+}
+
+if ($config.getStarted.emitBootstrapManifest) {
+  $bootstrapDir = Join-Path $RuntimeRoot 'bootstrap'
+  Ensure-Dir $bootstrapDir
+  $manifestPath = Join-Path $bootstrapDir 'openclaw-get-started.json'
+  $manifest = [ordered]@{
+    generated_at = (Get-Date).ToUniversalTime().ToString('o')
+    runtime_root = $RuntimeRoot
+    guarantees = $config.getStarted.operatorGuarantees
+    bootstrap_order = $config.getStarted.bootstrapOrder
+    steps = $bootstrapSteps
+    note = 'Start yamen-entry before yamen-prefect so the superior layer can dispatch instead of impersonating internal roles.'
+  } | ConvertTo-Json -Depth 8
+  Write-TextFile $manifestPath $manifest
 }
 
 Write-Host "Provisioned Yamen runtime at: $RuntimeRoot"
 $summary | Format-Table -AutoSize
+if ($config.getStarted.emitBootstrapManifest) {
+  Write-Host "Bootstrap manifest written to: $(Join-Path $RuntimeRoot 'bootstrap\openclaw-get-started.json')"
+}
 if (-not $sourceAuth) {
   Write-Warning "auth-profiles.json source not found; rerun with a valid source or use -Force to create placeholders."
 }

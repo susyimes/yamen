@@ -24,6 +24,13 @@
     "sessionMode": "spawn",
     "spawnMode": "reuse-or-spawn"
   },
+  "getStarted": {
+    "operatorGuarantees": [
+      "ensure_entry_available_before_prefect_dispatch"
+    ],
+    "bootstrapOrder": ["entry", "prefect"],
+    "emitBootstrapManifest": true
+  },
   "roles": {
     "prefect": {
       "workspace": "workspace-prefect",
