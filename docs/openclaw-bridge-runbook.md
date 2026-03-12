@@ -126,3 +126,23 @@ node runtime/openclaw-bridge-relay.js fail <request-file> "reason"
 ```
 
 第二阶段再做自动 watcher。
+
+## Adapter bundle（给宿主/Operator 的最小交接包）
+
+如果你希望把一次 bridge request 交给宿主侧 adapter / operator 去真正执行，可先导出一份 bundle：
+
+```bash
+node scripts/export-openclaw-adapter-bundle.js <request-file>
+```
+
+bundle 会包含：
+- `execution_plan`：按顺序执行的 OpenClaw tool 调用计划
+- `write_response.command`：成功后如何把 role JSON 写回
+- `fail_response.command`：失败时如何写 blocker 结果
+
+这让宿主侧不需要再自己拼：
+- 先 ensure `yamen-entry` 可用
+- 再 dispatch request
+- 最后写回 response
+
+而是直接消费 bundle 即可。

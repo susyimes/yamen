@@ -738,6 +738,19 @@ node scripts/relay-semi-auto.js <request-file>
 node scripts/relay-semi-auto.js <request-file> --stdin
 ```
 
+如果你准备把 request 真正交给宿主侧 adapter / operator 去执行，而不是只看参数草案，也可以先导出：
+
+```bash
+node scripts/export-openclaw-adapter-bundle.js <request-file>
+```
+
+它会把：
+- `execution_plan`
+- `write_response.command`
+- `fail_response.command`
+
+一次性打包出来，方便宿主侧顺序消费。
+
 ---
 
 ### 第 4 步：阶段 2 的主路径
