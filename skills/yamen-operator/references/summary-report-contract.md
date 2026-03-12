@@ -18,6 +18,12 @@ Use when:
 - a step finishes
 - a failure or timeout occurs
 - the whole flow completes
+- the operator switches runtime mode
+
+Recommended content additions:
+- current runtime mode: `triage | plan | execute | debug | review`
+- whether `kuaishou` ran as single, delegated, or parallel-delegated execution
+- debug trigger reason when `dianshi` is acting in `debug` mode
 
 ## 2. Prefect-facing final report
 
@@ -40,6 +46,11 @@ Contains:
 - artifacts / blockers / review notes
 - runtime outcome
 
+When applicable, also summarize:
+- whether the case entered `debug` mode
+- whether `dianshi` acted as diagnosis, review, or both
+- whether `kuaishou` execution was delegated
+
 ## 3. Separation rule
 
 Do not mix these two payloads.
@@ -57,3 +68,4 @@ The final report should let the prefect answer:
 - whether it finished, returned, or failed
 - what was produced
 - what needs follow-up, if anything
+- whether the case required diagnosis or risk review
