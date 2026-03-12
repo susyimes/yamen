@@ -28,6 +28,33 @@
     },
     "current_step": { "type": "string", "minLength": 1 },
     "mode": { "type": "string", "enum": ["direct", "filed", "reviewed"] },
+    "runtime_mode": {
+      "type": "string",
+      "enum": ["triage", "plan", "execute", "debug", "review"]
+    },
+    "execution_strategy": {
+      "type": "string",
+      "enum": ["single", "delegated", "parallel_delegated"]
+    },
+    "debug_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "entered_at"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "enum": [
+            "schema_mismatch",
+            "two_consecutive_failures",
+            "role_conflict",
+            "closure_failed",
+            "user_requested_rediagnosis"
+          ]
+        },
+        "detail": { "type": "string" },
+        "entered_at": { "type": "string", "format": "date-time" }
+      }
+    },
     "last_transition": {
       "type": "object",
       "additionalProperties": false,

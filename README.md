@@ -583,6 +583,12 @@ Yamen 不适合所有任务。
 - OpenClaw 负责 session / relay / execution / stop-and-report
 - `yamen-operator` 负责把规则真的驱动起来
 
+另外，当前这套 operator 已经补进几项新的运行时特性：
+- **runtime modes**：`triage / plan / execute / debug / review`
+- **delegated kuaishou**：`kuaishou` 作为正式执行席位，允许单人、sub-agent、并行 delegated 执行
+- **debug-mode triggers**：schema mismatch、连续两步失败、role 冲突、无法收口、用户明确要求重新定位问题
+- **dianshi seat**：`dianshi` 明确承载 `debug / review`
+
 ---
 
 ### 第 0 步：先 provision 一套角色运行环境
@@ -627,11 +633,12 @@ node scripts/run-operator-failure-smoke.js
 
 这两条分别验证：
 - 3 条 happy path：`direct / filed / reviewed`
-- 4 类简单失败：timeout / invalid JSON / `next_role` 漂移 / `entry` closure fail
+- 5 类关键失败：timeout / invalid JSON / `next_role` 漂移 / `entry` closure fail / repeated failure -> debug
 
 也就是说，当前 repo 里的 `yamen-operator` 已经至少具备了：
 - 最小 happy path 验证
 - 最小失败 stop-and-report 验证
+- debug trigger 的最小规则表达
 
 #### B. 把一个 bridge request 导出成可执行的 OpenClaw session tool 参数
 
@@ -742,6 +749,12 @@ node runtime/prefect-flow.js report <case_id> <entry-report.json>
 - `sessions_send`：向已有角色会话发 handoff
 - `write/edit`：生成任务单、报告、桥接 response
 - `exec/browser`：让快手承办执行具体动作
+
+同时，建议把下面这些运行时字段视为 operator 的标准观察面：
+- `mode`：案件模式（`direct / filed / reviewed`）
+- `runtime_mode`：当前运行模式（`triage / plan / execute / debug / review`）
+- `execution_strategy`：`kuaishou` 的执行策略（`single / delegated / parallel_delegated`）
+- `debug_trigger`：触发进入 debug mode 的原因与时间
 
 ---
 
